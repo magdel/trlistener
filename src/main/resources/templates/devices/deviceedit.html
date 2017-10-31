@@ -1,0 +1,20 @@
+<html layout:decorator="layout" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+</head>
+<body>
+<div layout:fragment="content" class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">Edit device</h3>
+    </div>
+    <div class="panel-body">
+        <form role="form" th:action="@{/devices/ucreate}" th:object="${device}" method="POST">
+            <div class="form-group">
+                <input type="text" placeholder="Name" th:field="*{name}" class="form-control"/>
+            </div>
+            <button type="submit" class="btn btn-success">Save</button>
+        </form>
+    </div>
+</div>
+</body>
+</html>
+                                                                                                  `

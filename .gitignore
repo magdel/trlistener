@@ -1,0 +1,6 @@
+*.iml
+/.idea
+*.log
+/ridelr-test
+/target
+rrr

@@ -1,0 +1,61 @@
+<html layout:decorator="layout" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+</head>
+<body>
+<div layout:fragment="content" class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">Latest events</h3>
+    </div>
+    <div class="panel-body">
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>Id</th>
+                <th>Date</th>
+                <th>Name</th>
+                <th>Location</th>
+                <th>Action</th>
+            </tr>
+            </thead>
+            <tbody>
+
+            <tr th:each="item : ${oEvents}">
+                <td><a th:href="@{/events/view/}+${item.id}"><p th:text="${item.id}"></p></a></td>
+                <td th:text="${item.date}"></td>
+                <td th:text="${item.name}"></td>
+                <td th:text="${item.place}"></td>
+                <td>
+                    <!-- <form action="/addToBasket" method="POST">
+                       <input id="id" name="id" type="hidden" th:value="${item.id}"/>
+                        <input id="name" name="name" type="hidden" th:value="${item.name}"/>
+                        <input id="cost" name="cost" type="hidden" th:value="${item.cost}"/>
+                        <input id="minutesToPrepare" name="minutesToPrepare" type="hidden"
+                               th:value="${item.minutesToPrepare}"/>
+                        <input type="submit" value="Add to basket"/>
+                    </form>                                          -->
+                </td>
+
+            </tr>
+            <tr>
+                <form th:action="@{/events}" method="POST">
+                    <td></td>
+                    <td><input id="date" name="date" type="text"/></td>
+                    <td><input id="name" name="name" type="text"/></td>
+                    <td><input id="place" name="place" type="text"/></td>
+                    <td><input type="submit" value="Create event"/></td>
+                </form>
+            </tr>
+            <!-- This example data will be removed by thmyeleafe during processing and replaced with the rows generated above -->
+            <tr th:remove="all">
+                <td>123456789</td>
+                <td>2014-08-01</td>
+                <td>Alek 2014</td>
+                <td>lake Silver</td>
+                <td></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,18 @@
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Sample java package for sending SMS via SMS Traffic
+//
+// (c) SMS Traffic, 2008
+// www.smstraffic.ru, info@smstraffic.ru, (495)228-3649, (495)642-9569
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+package ru.smstraffic.smsclient;
+
+public class FatalSmsException extends SmsException
+{
+	public FatalSmsException(String msg) 
+	{
+		super(msg);
+	}
+}

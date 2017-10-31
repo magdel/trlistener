@@ -1,0 +1,51 @@
+<html layout:decorator="layout" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+</head>
+<body>
+<div layout:fragment="content" class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title" th:text="#{devices.your}"></h3>
+    </div>
+    <div class="panel-body">
+        <div th:if="${message}"
+             th:text="${message}"
+             id="message" class="alert alert-info">
+        </div>
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>Id</th>
+                <th th:text="#{devices.added}">Added</th>
+                <th th:text="#{devices.name}">Name</th>
+                <th th:text="#{devices.device}">Device</th>
+                <th th:text="#{devices.status}">Status</th>
+                <th th:text="#{devices.data}">Data</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+
+            <tr th:each="item : ${devices}">
+                <td><a th:href="@{/devices/}+${item.id}"><p th:text="${item.id}"></p></a></td>
+                <td th:text="${item.created}"></td>
+                <td th:text="${item.name}"></td>
+                <td th:text="${item.deviceInfo}"></td>
+                <td th:text="${item.status}"></td>
+                <td th:text="${item.data}"></td>
+                <td></td>
+            </tr>
+            <!-- This example data will be removed by thmyeleafe during processing and replaced with the rows generated above -->
+            <tr th:remove="all">
+                <td>123456789</td>
+                <td>2014-08-01</td>
+                <td>LG 24</td>
+                <td>device</td>
+                <td>not connected</td>
+                <td></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="warn" name="ogps-tracker" packages="">
+    <Appenders>
+        <RollingFile name="RollingFile" fileName="ridelr-test.log"
+                     filePattern="ridelr-test/$${date:yyyy-MM}/ridelr-test-%d{MM-dd-yyyy}-%i.log.gz"
+                     append="true">
+            <PatternLayout>
+                <Pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}] [%t %4p %-40.40c{2.}] - %m%ex%n</Pattern>
+            </PatternLayout>
+            <Policies>
+                <TimeBasedTriggeringPolicy />
+            </Policies>
+        </RollingFile>
+        <Async name="Async">
+            <AppenderRef ref="RollingFile"/>
+        </Async>
+       <!-- <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{HH:mm:ss} [%t] %-5level %logger{36} - %msg%n" />
+        </Console>-->
+    </Appenders>
+
+    <Loggers>
+        <Root level="INFO">
+            <AppenderRef ref="Async"/>
+        </Root>
+    </Loggers>
+</Configuration>

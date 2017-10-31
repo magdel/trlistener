@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html layout:decorator="nomenulayout" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+</head>
+<body>
+<div layout:fragment="content" class="jumbotron">
+    <div id="container">
+
+
+        <h2>403 Access is denied</h2>
+        <div class="error-details">
+            Sorry, but you don't have permission to request that page.
+        </div>
+        <br/>
+        <span class="glyphicon glyphicon-home"></span>  <a th:href="@{/}"> Home</a>
+
+
+    </div>
+</div>
+</body>
+</html>

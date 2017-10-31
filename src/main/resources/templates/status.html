@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html layout:decorator="layout">
+<head>
+</head>
+<body>
+<div layout:fragment="content" class="jumbotron">
+    <div class="container">
+
+        <h3>System status</h3>
+
+        <p>Some counters to be sure all is good)</p>
+
+        <p th:text="${statlog}"></p>
+
+    </div>
+</div>
+</body>
+</html>

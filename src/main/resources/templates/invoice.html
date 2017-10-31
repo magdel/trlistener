@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html layout:decorator="layout">
+<head>
+</head>
+<body>
+<div layout:fragment="content" class="jumbotron">
+    <div class="container">
+
+        <div class="panel-body">
+            <div th:if="${message}"
+                 th:text="${message}"
+                 id="message" class="alert alert-info">
+            </div>
+
+
+
+            <iframe th:src="${invoicelink}"
+                width="184" height="36" frameborder="0"
+                allowtransparency="true" scrolling="no"></iframe>
+
+        </div>
+    </div>
+</div>
+</body>
+</html>

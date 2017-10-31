@@ -1,0 +1,72 @@
+<html layout:decorator="layout" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+</head>
+<body>
+<div layout:fragment="content" class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">Device information</h3>
+    </div>
+    <div class="panel-body">
+        <div th:if="${message}"
+             th:text="${message}"
+             id="message" class="alert alert-info">
+        </div>
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>Parameter</th>
+                <th>Value</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                    <td>id</td>
+                    <td th:text="${device.id}"></td>
+            </tr>
+            <tr>
+                <td>Name</td>
+                <td th:text="${device.name}"></td>
+            </tr>
+            <tr>
+                <td>Added</td>
+                <td th:text="${device.created}"></td>
+            </tr>
+            <tr>
+                <td>Status</td>
+            <!--<td >Status тут свитч, показываем:
+                Подключить
+                Показать ключ подключения
+                Показать отключить
+            </td>-->
+                <td th:if="${deviceToken}">
+                    <form role="form" th:action="${deviceToken.id}+'/disconnect'" method="POST">
+                        <button type="submit" class="btn btn-failure">Disconnect</button>
+                    </form>
+                </td>
+                <td th:if="${connectToken==null and deviceToken==null}">
+                    <form role="form" th:action="${device.id}+'/connect'" method="POST">
+                        <button type="submit" class="btn btn-success">Connect</button>
+                    </form>
+                </td>
+                <td th:if="${connectToken!=null and deviceToken==null}" th:text="${connectToken.bindToken}">
+                </td>
+
+            </tr>
+            <!-- This example data will be removed by thmyeleafe during processing and replaced with the rows generated above -->
+            <tr th:remove="all">
+                <td>P</td>
+                <td>V</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="panel-footer">
+        <form class="form-inline" role="form" th:action="${device.id}+'/delete'" method="post">
+            <a class="btn btn-primary" th:href="${device.id}+'/edit'" >Edit</a>
+            <button type="submit" class="btn btn-danger">Delete</button>
+        </form>
+    </div>
+</div>
+</body>
+</html>
+                                                                                                  `
