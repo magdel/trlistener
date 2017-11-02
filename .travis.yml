@@ -7,6 +7,6 @@ jdk:
   - oraclejdk8
 before_script:
   - psql -c "CREATE ROLE nrapptest WITH PASSWORD 'nrapptest';" -U postgres
-  - psql -c "CREATE DATABASE nrapptest OWNER nrapptest;" -U postgres
+  - psql -c "CREATE DATABASE nrapptest WITH OWNER nrapptest;" -U postgres
 after_success:
   - mvn clean test jacoco:report coveralls:report
