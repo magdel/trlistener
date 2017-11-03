@@ -3,10 +3,8 @@ package ru.netradar.server.queue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
-import ru.netradar.profiler.Profiler;
 import ru.netradar.server.queue.dao.Task;
 import ru.netradar.server.queue.dao.TaskStorage;
 
@@ -81,12 +79,7 @@ public abstract class QueueDaemon<T extends Task> {
                         boolean again = true;
                         while (again) {
                             LOG.info("Scanning queue...");
-                            Profiler.startSample(threadName);
-                            try {
-                                task = txTemplate.execute(status -> taskStorage.fetchNextTask());
-                            } finally {
-                                Profiler.endSample(threadName);
-                            }
+                            task = txTemplate.execute(status -> taskStorage.fetchNextTask());
 
                             if (task != null) {
                                 try {

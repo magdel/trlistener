@@ -8,7 +8,6 @@ import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
 import ru.netradar.config.properties.WebMonitorProperties;
-import ru.netradar.profiler.Profiler;
 
 import java.io.IOException;
 
@@ -32,15 +31,7 @@ public class SiteClient {
     }
 
     public HttpResponse executeHttpMethod(HttpRequestBase method) throws IOException {
-        final String key = "Site_" + method.getURI().getPath();
-        Profiler.startSample(key);
-        final HttpResponse response;
-        try {
-            response = httpClient.execute(host, method);
-        } finally {
-            Profiler.endSample(key);
-        }
-        return response;
+        return httpClient.execute(host, method);
     }
 
     public String executeURI(String param) throws IOException {

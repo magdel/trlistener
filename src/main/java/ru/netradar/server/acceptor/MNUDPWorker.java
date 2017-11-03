@@ -1,14 +1,17 @@
 package ru.netradar.server.acceptor;
 
 import org.apache.log4j.Logger;
-import ru.netradar.profiler.Profiler;
 import ru.netradar.server.device.NRDevice;
 import ru.netradar.server.device.NRLocation;
 import ru.netradar.server.device.NRObject;
 import ru.netradar.server.storage.DeviceStorage;
 import ru.netradar.util.MD5;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.net.DatagramPacket;
 
 
@@ -28,11 +31,12 @@ public class MNUDPWorker implements Runnable {
         if (LOG.isDebugEnabled()) {
             LOG.debug("UDP Processing packet, size " + p.getLength());
         }
-        Profiler.startSample(MNUDP_WORKER);
         try {
             final DataInputStream s = new DataInputStream(new ByteArrayInputStream(p.getData(), p.getOffset(), p.getLength()));
             final byte command = s.readByte();
-            if (command != 1) return;
+            if (command != 1) {
+                return;
+            }
             final int cmdSize = s.readInt();
             //    LOG.info("CmdSize " + cmdSize + ", ms: " + s.markSupported());
 
@@ -84,8 +88,6 @@ public class MNUDPWorker implements Runnable {
             LOG.error("UDP Packet IO: " + e.getMessage(), e);
         } catch (Exception e) {
             LOG.error("UDP: " + e.getMessage(), e);
-        } finally {
-            Profiler.endSample(MNUDP_WORKER);
         }
     }
 }

@@ -10,7 +10,6 @@ package ru.netradar.server.acceptor.sockets.connect;
 
 import org.apache.log4j.Logger;
 import ru.netradar.config.properties.SMSQueueProperties;
-import ru.netradar.profiler.Profiler;
 import ru.netradar.server.NRServer;
 import ru.netradar.server.acceptor.sockets.LocThread;
 import ru.netradar.server.device.NRDevice;
@@ -27,7 +26,12 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.net.Socket;
 import java.text.DateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
+import java.util.Random;
 
 /**
  * @author Raev
@@ -184,12 +188,6 @@ public class DGLocThread extends LocThread {
             } else if (nru.userType == NRObject.TR102USERTYPE) {
                 commonInfo.append("TR: ").append(nru.imei).append("(").append(nru.connectedTimes).append(":").append(nru.disconnectedTimes).append(")").append(wt).append("\n");
             }
-        }
-        commonInfo.append("\n----------------\n-              -\n----------------\n");
-        commonInfo.append("-=<Profilers>=-\n");
-        for (String key: Profiler.getKeys()){
-            final String logInfo = Profiler.getLogInfo(key);
-            commonInfo.append(logInfo).append('\n');
         }
 
         commonInfo.append("\n----------------\n-              -\n----------------\n");

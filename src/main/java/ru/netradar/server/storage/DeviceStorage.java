@@ -5,7 +5,6 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
 import ru.netradar.config.properties.WebMonitorProperties;
-import ru.netradar.profiler.Profiler;
 import ru.netradar.server.device.NRDevice;
 import ru.netradar.server.device.NRLocation;
 import ru.netradar.server.device.NRObject;
@@ -117,32 +116,22 @@ public class DeviceStorage implements DiagInformation {
     }
 
     public void notifyPosition(final NRDevice device, final NRLocation location) {
-        Profiler.startSample(NOTIFY_POSITION);
-        try {
-            //проверить последнее время обновления у этого девайса
-            final long time = System.currentTimeMillis();
-            if (time - device.getLastStoredPosTime() > 3000) {
-                device.setLastStoredPosTime(time);
-                txTemplate.execute(new TransactionCallbackWithoutResult() {
-                    @Override
-                    protected void doInTransactionWithoutResult(TransactionStatus status) {
-                        locationNotifier.notifyLocation(device, location);
-                        deviceDAO.updateDeviceLocation(device, location);
-                    }
-                });
-            }
-        } finally {
-            Profiler.endSample(NOTIFY_POSITION);
+        //проверить последнее время обновления у этого девайса
+        final long time = System.currentTimeMillis();
+        if (time - device.getLastStoredPosTime() > 3000) {
+            device.setLastStoredPosTime(time);
+            txTemplate.execute(new TransactionCallbackWithoutResult() {
+                @Override
+                protected void doInTransactionWithoutResult(TransactionStatus status) {
+                    locationNotifier.notifyLocation(device, location);
+                    deviceDAO.updateDeviceLocation(device, location);
+                }
+            });
         }
     }
 
     public void notifyInfo(NRDevice device, String info, long time) {
-        Profiler.startSample(NOTIFY_INFO);
-        try {
-            infoNotifier.notifyInfo(device, info, time);
-        } finally {
-            Profiler.endSample(NOTIFY_INFO);
-        }
+        infoNotifier.notifyInfo(device, info, time);
     }
 
     public void init() {
