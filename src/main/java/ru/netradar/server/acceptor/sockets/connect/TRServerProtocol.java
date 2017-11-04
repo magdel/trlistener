@@ -38,7 +38,8 @@ public class TRServerProtocol {
         this.deviceStorage = deviceStorage;
         userCheckUrl = settings.getUsercheckurl();
         calUTC = Calendar.getInstance(TimeZone.getTimeZone(UTC));
-        calUTC.setTimeInMillis(System.currentTimeMillis());
+        long millis = System.currentTimeMillis();
+        calUTC.setTimeInMillis(millis - (millis % 1000));
     }
 
     String userCheckUrl;
@@ -70,10 +71,11 @@ public class TRServerProtocol {
 
                     String imei = info[0].substring(1);
                     errpos = 3;
-                    if (s.length() < 500)
+                    if (s.length() < 500) {
                         LOG.info(s);
-                    else
+                    } else {
                         LOG.info("Strange big message: " + s.substring(0, 490) + "...");
+                    }
                     errpos = 3.1f;
 
 
@@ -127,7 +129,9 @@ public class TRServerProtocol {
                     } else {
                         errpos = 13.1f;
 
-                        if (servThread.dNR.imei != Long.parseLong(imei)) throw new Exception("Changed IMEI");
+                        if (servThread.dNR.imei != Long.parseLong(imei)) {
+                            throw new Exception("Changed IMEI");
+                        }
                         errpos = 13.2f;
                         user = servThread.dNR;
                     }
@@ -143,14 +147,18 @@ public class TRServerProtocol {
                     errpos = 15;
                     double LON = Integer.parseInt(s.substring(1, 4)) + Double.parseDouble(s.substring(4, 11)) / 60.0;
                     errpos = 1;
-                    if (s.charAt(0) == 'W') LON = -LON;
+                    if (s.charAt(0) == 'W') {
+                        LON = -LON;
+                    }
 
                     errpos = 16;
                     s = info[6];
                     errpos = 17;
                     double LAT = Integer.parseInt(s.substring(1, 3)) + Double.parseDouble(s.substring(3, 10)) / 60.0;
                     errpos = 18;
-                    if (s.charAt(0) == 'S') LAT = -LAT;
+                    if (s.charAt(0) == 'S') {
+                        LAT = -LAT;
+                    }
 
                     errpos = 19;
                     int lat = (int) (LAT * 100000);
