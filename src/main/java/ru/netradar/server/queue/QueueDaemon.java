@@ -22,8 +22,6 @@ public abstract class QueueDaemon<T extends Task> {
     private final static Logger LOG = LoggerFactory.getLogger(QueueDaemon.class);
     private final Runnable thrdRunnable;
     private final Thread[] thrds;
-    private final Object syncObj = new Object();
-    //private final Set<Long> processingSet = new HashSet<Long>();
     private final String shortName;
 
     public QueueDaemon(final TransactionTemplate txTemplate,
@@ -35,8 +33,17 @@ public abstract class QueueDaemon<T extends Task> {
 
             void processTask(final T task) throws InterruptedException {
                 boolean done = executor.processTask(task);
-                synchronized (syncObj) {
-                    if (done) {
+                if (done) {
+                    try {
+                        txTemplate.execute(new TransactionCallbackWithoutResult() {
+                            @Override
+                            protected void doInTransactionWithoutResult(TransactionStatus status) {
+                                taskStorage.deleteTask(task);
+                            }
+                        });
+                    } catch (Exception e) {
+                        LOG.error("Delete failed, retry made, " + e.getMessage());
+                        Thread.sleep(200);
                         try {
                             txTemplate.execute(new TransactionCallbackWithoutResult() {
                                 @Override
@@ -44,19 +51,8 @@ public abstract class QueueDaemon<T extends Task> {
                                     taskStorage.deleteTask(task);
                                 }
                             });
-                        } catch (Exception e) {
-                            LOG.error("Delete failed, retry made, " + e.getMessage());
-                            Thread.sleep(200);
-                            try {
-                                txTemplate.execute(new TransactionCallbackWithoutResult() {
-                                    @Override
-                                    protected void doInTransactionWithoutResult(TransactionStatus status) {
-                                        taskStorage.deleteTask(task);
-                                    }
-                                });
-                            } catch (Exception ee) {
-                                LOG.error("Delete failed: " + ee.getMessage() + ", task " + task);
-                            }
+                        } catch (Exception ee) {
+                            LOG.error("Delete failed: " + ee.getMessage() + ", task " + task);
                         }
                     }
                 }
