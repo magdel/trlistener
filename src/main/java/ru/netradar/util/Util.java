@@ -1,8 +1,16 @@
 package ru.netradar.util;
 
 import org.apache.log4j.Logger;
+import org.joda.time.DateTimeZone;
+import org.joda.time.format.DateTimeFormatterBuilder;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Calendar;
@@ -10,8 +18,21 @@ import java.util.Date;
 import java.util.TimeZone;
 
 public final class Util {
-
     private final static Logger LOG = Logger.getLogger(Util.class);
+
+    private static final org.joda.time.format.DateTimeFormatter HTTP_DATE_TIME_FORMATTER_MSK =
+            new DateTimeFormatterBuilder()
+                    .appendDayOfMonth(2)
+                    .appendLiteral('.')
+                    .appendMonthOfYear(2)
+                    .appendLiteral('.')
+                    .appendYear(4, 9)
+                    .appendLiteral(' ')
+                    .appendHourOfDay(2)
+                    .appendLiteral('.')
+                    .appendMinuteOfHour(2)
+                    .toFormatter()
+                    .withZone(DateTimeZone.forID("Europe/Moscow"));
 
     public static String getHumanTime(long millis) {
         if (millis < 3000) {
@@ -68,11 +89,14 @@ public final class Util {
 
     static private char toHexChar(int digitValue) {
         if (digitValue < 10)
-            // Convert value 0-9 to char 0-9 hex char
+        // Convert value 0-9 to char 0-9 hex char
+        {
             return (char) ('0' + digitValue);
-        else
-            // Convert value 10-15 to A-F hex char
+        } else
+        // Convert value 10-15 to A-F hex char
+        {
             return (char) ('A' + (digitValue - 10));
+        }
     }
 
     public final static ByteArrayOutputStream getHTTPContent(String url) {
@@ -92,7 +116,9 @@ public final class Util {
                 int nr = 0;
                 while (true) {
                     nr = is.read(pb, 0, pb.length);
-                    if (nr < 0) break;
+                    if (nr < 0) {
+                        break;
+                    }
                     baos.write(pb, 0, nr);
                 }
                 pb = null;
@@ -103,7 +129,9 @@ public final class Util {
                 } catch (Throwable t) {
                 }
                 try {
-                    if (is != null) is.close();
+                    if (is != null) {
+                        is.close();
+                    }
                 } catch (Throwable t) {
                 }
             }
@@ -112,36 +140,6 @@ public final class Util {
         }
         return baos;
     }
-
-    public final static void sendGetHTTP(String url) throws IOException {
-        InputStream is = null;
-        HttpURLConnection c;
-        //  try {
-        c = getHttpConn(url);
-        try {
-            is = c.getInputStream();
-            byte[] pb = new byte[512];
-            int nr = 0;
-            while (true) {
-                nr = is.read(pb, 0, pb.length);
-                if (nr < 0) break;
-            }
-        } finally {
-            try {
-                c.disconnect();
-            } catch (Throwable t) {
-            }
-            try {
-                if (is != null) is.close();
-            } catch (Throwable t) {
-            }
-        }
-        //  } catch (Throwable e) {
-        // LogWriteThread.printlnlogER("send GetHTTP: "+url+" : "+e.toString());
-
-        // }
-    }
-
 
     /**
      * Return connection even if redirection happens
@@ -159,8 +157,9 @@ public final class Util {
 
             //   if(respCode != HttpURLConnection.HTTP_TEMP_REDIRECT) {
             if (respCode != HttpURLConnection.HTTP_MOVED_TEMP) {
-                if (respCode != HttpURLConnection.HTTP_MOVED_PERM)
+                if (respCode != HttpURLConnection.HTTP_MOVED_PERM) {
                     break;
+                }
             }
             //  }
             url = httpConn.getHeaderField("Location");
@@ -216,11 +215,6 @@ public final class Util {
         return result;
     }
 
-    public final static String getHTTPContentAsString(String url) {
-        return Util.byteArrayToString(getHTTPContent(url).toByteArray(), true);
-    }
-
-
     public static double javaTime2WinTime(long ts) {
         return (double) ((double) ts / 86400000.0d + 25569.0d);
     }
@@ -235,137 +229,18 @@ public final class Util {
     }
 
     public final static int hex2int(char c) {
-        if (c >= '0' && c <= '9')
+        if (c >= '0' && c <= '9') {
             return c - 48;
-        if (c >= 'A' && c <= 'F')
+        }
+        if (c >= 'A' && c <= 'F') {
             return (c - 65) + 10;
-        if (c >= 'a' && c <= 'f')
+        }
+        if (c >= 'a' && c <= 'f') {
             return (c - 97) + 10;
-        else
+        } else {
             return 0;
+        }
     }
-//
-//  private static String urlDecode(String s, boolean flag) {
-//    char ac[] = s.toCharArray();
-//    StringBuffer stringbuffer = new StringBuffer();
-//    for(int i = 0; i < ac.length; i++)
-//      if(ac[i] == '%') {
-//      if(i >= ac.length - 2)
-//        break;
-//      char c = '\0';
-//      for(int j = 1; j <= 2; j++)
-//        c = (char)((c <<= '\004') + _aCI(ac[i + j]));
-//
-//      stringbuffer.append(c);
-//      i += 2;
-//      } else
-//        if(flag && ac[i] == '+')
-//          stringbuffer.append(' ');
-//        else
-//          stringbuffer.append(ac[i]);
-//
-//    return stringbuffer.toString();
-//  }
-//
-//  public static String _bStringvString(String s, boolean flag) {
-//    String s1 = urlDecode(s, flag);
-//    String as[] = {
-//      "amp;quot;", "amp;apos;", "amp;", "lt;", "gt;", "quot;", "apos;", "circ;", "tilde;", "nbsp;"
-//    };
-//    char ac[] = {
-//      '"', '\'', '&', '<', '>', '"', '\'', '^', '~', ' '
-//    };
-//    char ac1[] = s1.toCharArray();
-//    StringBuffer stringbuffer = new StringBuffer();
-//    label0:
-//      for(int i = 0; i < ac1.length; i++)
-//        if(ac1[i] == '&') {
-//        if(i >= ac1.length - 3)
-//          break;
-//        String s2 = s1.substring(i + 1);
-//        if(ac1[i + 1] == '#') {
-//          int j;
-//          if((j = s2.indexOf(';')) < 0)
-//            break;
-//          String s3 = s2.substring(1, j);
-//          try {
-//            char c = (char)Integer.parseInt(s3);
-//            stringbuffer.append(c);
-//          } catch(NumberFormatException _ex) {
-//            break;
-//          }
-//          i += j + 1;
-//          continue;
-//        }
-//        for(int k = 0; k < as.length; k++) {
-//          if(!s2.startsWith(as[k]))
-//            continue;
-//          stringbuffer.append(ac[k]);
-//          i += as[k].length();
-//          continue label0;
-//        }
-//
-//        stringbuffer.append(ac1[i]);
-//        } else {
-//        stringbuffer.append(ac1[i]);
-//        }
-//
-//      return stringbuffer.toString();
-//  }
-
-//	public static String toHexString(byte[] b)
-//	{
-//		StringBuffer sb = new StringBuffer(b.length * 2);
-//		for (int i = 0; i < b.length; i++)
-//		{
-//			//	look up high nibble char
-//			sb.append(hexChar[(b[i] & 0xf0) >>> 4]);
-//
-//			//	look up low nibble char
-//			sb.append(hexChar[b[i] & 0x0f]);
-//			sb.append(" ");
-//			if ((i != 0) && ((i % 15) == 0)) sb.append("\n");
-//		}
-//		return sb.toString();
-//	}
-//
-//	//	table to convert a nibble to a hex char.
-//	private static char[] hexChar = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
-//
-////
-//	// Extracts the byte from the buffer (buf) at position off
-//	public static int getByte(byte[] buf, int off)
-//	{
-//		int val;
-//		val = ((int) buf[off]) & 0x000000FF;
-//		return (val);
-//	}
-//
-//
-//	// Puts the specified byte (val) into the buffer (buf) at position off
-//	public static void putByte(byte[] buf, int off, int val)
-//	{
-//		buf[off] = (byte) (val & 0x000000FF);
-//	}
-//
-//
-//	// Extracts the word from the buffer (buf) at position off using the specified byte ordering (bigEndian)
-//	public static int getWord(byte[] buf, int off, boolean bigEndian)
-//	{
-//		int val;
-//		if (bigEndian)
-//		{
-//			val = (((int) buf[off]) << 8) & 0x0000FF00;
-//			val |= (((int) buf[++off])) & 0x000000FF;
-//		}
-//		else   // Little endian
-//		{
-//			val = (((int) buf[off])) & 0x000000FF;
-//			val |= (((int) buf[++off]) << 8) & 0x0000FF00;
-//		}
-//		return (val);
-//	}
-//
 
     static public DataInputStream getDataInputStream(byte[] array, int offset) {
         return new DataInputStream(new ByteArrayInputStream(array, offset, array.length - offset));
@@ -374,105 +249,6 @@ public final class Util {
     static public DataInputStream getDataInputStream(byte[] array) {
         return getDataInputStream(array, 0);
     }
-
-//	static public int getWord(DataInputStream stream, boolean bigEndian) throws IOException
-//	{
-//		return bigEndian
-//				?
-//					stream.readUnsignedShort()
-//				:
-//					((int)stream.readByte()&0x00FF) | (((int)stream.readByte()<<8)&0xFF00);
-//	}
-//
-//	static public String readAsciiz(DataInputStream stream) throws IOException
-//	{
-//		int len = Util.getWord(stream, false);
-//		if (len == 0) return new String();
-//		byte[] buffer = new byte[len];
-//		stream.readFully(buffer);
-//		return Util.byteArrayToString(buffer);
-//	}
-
-//	static public void writeWord(ByteArrayOutputStream stream, int value, boolean bigEndian)
-//	{
-//		if (bigEndian)
-//		{
-//			stream.write(((value&0xFF00)>>8)&0xFF);
-//			stream.write(value&0xFF);
-//		}
-//		else
-//		{
-//			stream.write(value&0xFF);
-//			stream.write(((value&0xFF00)>>8)&0xFF);
-//		}
-//	}
-
-//	static public void writeByteArray(ByteArrayOutputStream stream, byte[] array)
-//	{
-//		try
-//		{
-//			stream.write(array);
-//		}
-//		catch (Exception e)
-//		{
-//			System.out.println("Util.writeByteArray: "+e.toString());
-//		}
-//	}
-
-//	static public void writeDWord(ByteArrayOutputStream stream, int value, boolean bigEndian)
-//	{
-//		if (bigEndian)
-//		{
-//			stream.write(((value&0xFF000000)>>24)&0xFF);
-//			stream.write(((value&0xFF0000)>>16)&0xFF);
-//			stream.write(((value&0xFF00)>>8)&0xFF);
-//			stream.write(value&0xFF);
-//		}
-//		else
-//		{
-//			stream.write(value&0xFF);
-//			stream.write(((value&0xFF00)>>8)&0xFF);
-//			stream.write(((value&0xFF0000)>>16)&0xFF);
-//			stream.write(((value&0xFF000000)>>24)&0xFF);
-//		}
-//	}
-
-//	static public void writeByte(ByteArrayOutputStream stream, int value)
-//	{
-//		stream.write(value);
-//	}
-//
-//	static public void writeLenAndString(ByteArrayOutputStream stream, String value, boolean utf8)
-//	{
-//		byte[] raw = Util.stringToByteArray(value, utf8);
-//		writeWord(stream, raw.length, true);
-//		stream.write(raw, 0, raw.length);
-//	}
-//
-//	static public void writeAsciizTLV(int type, ByteArrayOutputStream stream, String value)
-//	{
-//		writeWord(stream, type, true);
-//		byte[] raw = Util.stringToByteArray(value);
-//		writeWord(stream, raw.length+3, false);
-//		writeWord(stream, raw.length+1, false);
-//		stream.write(raw, 0, raw.length);
-//		stream.write(0);
-//	}
-//
-//	static public void writeTLV(int type, ByteArrayOutputStream stream, ByteArrayOutputStream data)
-//	{
-//		byte[] raw = data.toByteArray();
-//		writeWord(stream, type, true);
-//		writeWord(stream, raw.length, false);
-//		stream.write(raw, 0, raw.length);
-//	}
-
-//	// Extracts the word from the buffer (buf) at position off using big endian byte ordering
-//	public static int getWord(byte[] buf, int off)
-//	{
-//		return (Util.getWord(buf, off, true));
-//	}
-
 
     // Puts the specified word (val) into the buffer (buf) at position off using the specified byte ordering (bigEndian)
 
@@ -492,74 +268,6 @@ public final class Util {
     public static void putWord(byte[] buf, int off, int val) {
         Util.putWord(buf, off, val, true);
     }
-
-
-//	// Extracts the double from the buffer (buf) at position off using the specified byte ordering (bigEndian)
-//	public static long getDWord(byte[] buf, int off, boolean bigEndian)
-//	{
-//		long val;
-//		if (bigEndian)
-//		{
-//			val = (((long) buf[off]) << 24) & 0xFF000000;
-//			val |= (((long) buf[++off]) << 16) & 0x00FF0000;
-//			val |= (((long) buf[++off]) << 8) & 0x0000FF00;
-//			val |= (((long) buf[++off])) & 0x000000FF;
-//		}
-//		else   // Little endian
-//		{
-//			val = (((long) buf[off])) & 0x000000FF;
-//			val |= (((long) buf[++off]) << 8) & 0x0000FF00;
-//			val |= (((long) buf[++off]) << 16) & 0x00FF0000;
-//			val |= (((long) buf[++off]) << 24) & 0xFF000000;
-//		}
-//		return (val);
-//	}
-
-
-//	// Extracts the double from the buffer (buf) at position off using big endian byte ordering
-//	public static long getDWord(byte[] buf, int off)
-//	{
-//		return (Util.getDWord(buf, off, true));
-//	}
-
-
-//	// Puts the specified double (val) into the buffer (buf) at position off using the specified byte ordering (bigEndian)
-//	public static void putDWord(byte[] buf, int off, long val, boolean bigEndian)
-//	{
-//		if (bigEndian)
-//		{
-//			buf[off] = (byte) ((val >> 24) & 0x00000000000000FF);
-//			buf[++off] = (byte) ((val >> 16) & 0x00000000000000FF);
-//			buf[++off] = (byte) ((val >> 8) & 0x00000000000000FF);
-//			buf[++off] = (byte) ((val) & 0x00000000000000FF);
-//		}
-//		else   // Little endian
-//		{
-//			buf[off] = (byte) ((val) & 0x00000000000000FF);
-//			buf[++off] = (byte) ((val >> 8) & 0x00000000000000FF);
-//			buf[++off] = (byte) ((val >> 16) & 0x00000000000000FF);
-//			buf[++off] = (byte) ((val >> 24) & 0x00000000000000FF);
-//		}
-//	}
-//
-//
-//	// Puts the specified double (val) into the buffer (buf) at position off using big endian byte ordering
-//	public static void putDWord(byte[] buf, int off, long val)
-//	{
-//		Util.putDWord(buf, off, val, true);
-//	}
-
-
-//	// getTlv(byte[] buf, int off) => byte[]
-//	public static byte[] getTlv(byte[] buf, int off)
-//	{
-//		if (off + 4 > buf.length) return (null);   // Length check (#1)
-//		int length = Util.getWord(buf, off + 2);
-//		if (off + 4 + length > buf.length) return (null);   // Length check (#2)
-//		byte[] value = new byte[length];
-//		System.arraycopy(buf, off + 4, value, 0, length);
-//		return (value);
-//	}
 
 
     // Extracts a string from the buffer (buf) starting at position off, ending at position off+len
@@ -600,14 +308,6 @@ public final class Util {
 
     }
 
-
-//	// Extracts a string from the buffer (buf) starting at position off, ending at position off+len
-//	public static String byteArrayToString1251(byte[] buf, int off, int len)
-//	{
-//		return (Util.byteArrayToString(buf, off, len, false));
-//	}
-
-
     // Converts the specified buffer (buf) to a string
 
     public static String byteArrayUTFToString(byte[] buf) {
@@ -618,47 +318,13 @@ public final class Util {
         return (Util.byteArrayToString(buf, 0, buf.length, utf8));
     }
 
-
-//	// Converts the specified buffer (buf) to a string
-//	public static String byteArrayToString(byte[] buf)
-//	{
-//		return (Util.byteArrayToString(buf, 0, buf.length, false));
-//	}
-
-//	// Converts the specific 4 byte max buffer to an unsigned long
-//	public static long byteArrayToLong(byte[] b)
-//	{
-//		long l = 0;
-//	    l |= b[0] & 0xFF;
-//	    l <<= 8;
-//	    l |= b[1] & 0xFF;
-//	    l <<= 8;
-//	    if (b.length > 3)
-//		{
-//			l |= b[2] & 0xFF;
-//			l <<= 8;
-//			l |= b[3] & 0xFF;
-//		}
-//	    return l;
-//	}
-
-//	// Converts a byte array to a hex string
-//    public static String byteArrayToHexString(byte[] buf) {
-//        StringBuffer hexString = new StringBuffer(buf.length);
-//        String hex;
-//        for (int i = 0; i < buf.length; i++) {
-//            hex = Integer.toHexString(0x0100 + (buf[i] & 0x00FF)).substring(1);
-//            hexString.append((hex.length() < 2 ? "0" : "") + hex);
-//        }
-//        return hexString.toString();
-//    }
-
     public static byte[] stringLatinToByteArray(String val) {
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             DataOutputStream dos = new DataOutputStream(baos);
-            for (int i = 0; i < val.length(); i++)
+            for (int i = 0; i < val.length(); i++) {
                 dos.writeByte((byte) val.charAt(i));
+            }
 
             return baos.toByteArray();
         } catch (Exception e) {
@@ -698,92 +364,6 @@ public final class Util {
 
     }
 
-
-//	// Converts the specified string (val) to a byte array
-//	public static byte[] stringToByteArray(String val)
-//	{
-//		return (Util.stringToByteArray(val, false));
-//	}
-//
-//
-//	// Converts the specified string to UCS-2BE
-//	public static byte[] stringToUcs2beByteArray(String val)
-//	{
-//		byte[] ucs2be = new byte[val.length() * 2];
-//		for (int i = 0; i < val.length(); i++)
-//		{
-//			Util.putWord(ucs2be, i * 2, (int) val.charAt(i));
-//		}
-//		return (ucs2be);
-//	}
-
-
-//	// Extract a UCS-2BE string from the specified buffer (buf) starting at position off, ending at position off+len
-//	public static String ucs2beByteArrayToString(byte[] buf, int off, int len)
-//	{
-//
-//		// Length check
-//		if ((off + len > buf.length) || (buf.length % 2 != 0))
-//		{
-//			return (null);
-//		}
-//
-//		// Convert
-//		StringBuffer sb = new StringBuffer();
-//		for (int i = off; i < off+len; i += 2)
-//		{
-//			sb.append((char) Util.getWord(buf, i));
-//		}
-//		return (sb.toString());
-//
-//	}
-
-
-//	// Extracts a UCS-2BE string from the specified buffer (buf)
-//	public static String ucs2beByteArrayToString(byte[] buf)
-//	{
-//		return (Util.ucs2beByteArrayToString(buf, 0, buf.length));
-//	}
-
-//	public static void showBytes(byte[] data)
-//	{
-//		StringBuffer buffer1 = new StringBuffer(), buffer2 = new StringBuffer();
-//
-//		for (int i = 0; i < data.length; i++)
-//		{
-//			int charaster = ((int)data[i])&0xFF;
-//			buffer1.append(charaster < ' ' || charaster >= 128 ? '.' : (char)charaster);
-//			String hex = Integer.toHexString(((int)data[i])&0xFF);
-//			buffer2.append(hex.length() == 1 ? "0"+hex : hex);
-//			buffer2.append(" ");
-//
-//			if (((i%16) == 15) || (i == (data.length-1)))
-//			{
-//				while (buffer2.length() < 16*3) buffer2.append(' ');
-//				System.out.print(buffer2.toString());
-//				System.out.println(buffer1.toString());
-//
-//				buffer1.setLength(0);
-//				buffer2.setLength(0);
-//			}
-//		}
-//		System.out.println();
-//	}
-
-
-//	// Removes all CR occurences
-//	public static String removeCr(String val)
-//	{
-//		StringBuffer result = new StringBuffer();
-//		for (int i = 0; i < val.length(); i++)
-//		{
-//			char chr = val.charAt(i);
-//			if ((chr == 0) || (chr == '\r')) continue;
-//			result.append(chr);
-//		}
-//		return result.toString();
-//	}
-
     //
     // Restores CRLF sequense from LF
 
@@ -797,184 +377,17 @@ public final class Util {
         int size = val.length();
         for (int i = 0; i < size; i++) {
             char chr = val.charAt(i);
-            if (chr == '\r') continue;
-            if (chr == '\n') result.append("\r\n");
-            else result.append(chr);
+            if (chr == '\r') {
+                continue;
+            }
+            if (chr == '\n') {
+                result.append("\r\n");
+            } else {
+                result.append(chr);
+            }
         }
         return result.toString();
     }
-//
-//	public static String removeClRfAndTabs(String val)
-//	{
-//		int len = val.length();
-//		char[] dst = new char[len];
-//		for (int i = 0; i < len; i++)
-//		{
-//			char chr = val.charAt(i);
-//			if ((chr == '\n') || (chr == '\r') || (chr == '\t')) chr = ' ';
-//			dst[i] = chr;
-//		}
-//		return new String(dst, 0, len);
-//	}
-
-
-//	// Compare to byte arrays (return true if equals, false otherwise)
-//	public static boolean byteArrayEquals(byte[] buf1, int off1, byte[] buf2, int off2, int len)
-//	{
-//
-//		// Length check
-//		if ((off1 + len > buf1.length) || (off2 + len > buf2.length))
-//		{
-//			return (false);
-//		}
-//
-//		// Compare bytes, stop at first mismatch
-//		for (int i = 0; i < len; i++)
-//		{
-//			if (buf1[off1 + i] != buf2[off2 + i])
-//			{
-//				return (false);
-//			}
-//		}
-//
-//		// Return true if this point is reached
-//		return (true);
-//
-//	}
-
-
-//
-//	//  If the numer has only one digit add a 0
-//	public static String makeTwo(int number)
-//	{
-//		if (number < 10)
-//		{
-//			return ("0" + String.valueOf(number));
-//		}
-//		else
-//		{
-//			return (String.valueOf(number));
-//		}
-//	}
-//
-
-    // #sijapp cond.end #
-
-//
-//    // Check is data array utf-8 string
-//    public static boolean isDataUTF8(byte[] array, int start, int lenght)
-//    {
-//        if (lenght == 0) return false;
-//        if (array.length < (start + lenght)) return false;
-//
-//        for (int i = start, len = lenght; len > 0;)
-//        {
-//            int seqLen = 0;
-//            byte bt = array[i++];
-//            len--;
-//
-//            if      ((bt&0xE0) == 0xC0) seqLen = 1;
-//            else if ((bt&0xF0) == 0xE0) seqLen = 2;
-//            else if ((bt&0xF8) == 0xF0) seqLen = 3;
-//            else if ((bt&0xFC) == 0xF8) seqLen = 4;
-//            else if ((bt&0xFE) == 0xFC) seqLen = 5;
-//
-//            if (seqLen == 0)
-//            {
-//                if ((bt&0x80) == 0x80) return false;
-//                else continue;
-//            }
-//
-//            for (int j = 0; j < seqLen; j++)
-//            {
-//                if (len == 0) return false;
-//                bt = array[i++];
-//                if ((bt&0xC0) != 0x80) return false;
-//                len--;
-//            }
-//            if (len == 0) break;
-//        }
-//        return true;
-//    }
-
-//	// Returns String value of cost value
-//	public static String intToDecimal(int value)
-//	{
-//		String costString = "";
-//		String afterDot = "";
-//		try
-//		{
-//			if (value != 0) {
-//				costString = Integer.toString(value / 1000) + ".";
-//				afterDot = Integer.toString(value % 1000);
-//				while (afterDot.length() != 3)
-//				{
-//					afterDot = "0" + afterDot;
-//				}
-//				while ((afterDot.endsWith("0")) && (afterDot.length() > 2))
-//				{
-//					afterDot = afterDot.substring(0, afterDot.length() - 1);
-//				}
-//				costString = costString + afterDot;
-//				return costString;
-//			}
-//			else
-//			{
-//				return new String("0.0");
-//			}
-//		}
-//		catch (Exception e)
-//		{
-//			return new String("0.0");
-//		}
-//	}
-//
-//	// Extracts the number value form String
-//	public static int decimalToInt(String string)
-//	{
-//		int value = 0;
-//		byte i = 0;
-//		char c = new String(".").charAt(0);
-//		try
-//		{
-//			for (i = 0; i < string.length(); i++)
-//			{
-//				if (c != string.charAt(i))
-//				{
-//					break;
-//				}
-//			}
-//			if (i == string.length()-1)
-//			{
-//				value = Integer.parseInt(string) * 1000;
-//				return (value);
-//			}
-//			else
-//			{
-//				while (c != string.charAt(i))
-//				{
-//					i++;
-//				}
-//				value = Integer.parseInt(string.substring(0, i)) * 1000;
-//				string = string.substring(i + 1, string.length());
-//				while (string.length() > 3)
-//				{
-//					string = string.substring(0, string.length() - 1);
-//				}
-//				while (string.length() < 3)
-//				{
-//					string = string + "0";
-//				}
-//				value = value + Integer.parseInt(string);
-//				return value;
-//			}
-//		}
-//		catch (Exception e)
-//		{
-//			return (0);
-//		}
-//	}
-
 
     // Converts an Unicode string into CP1251 byte array
 
@@ -1109,7 +522,9 @@ public final class Util {
             StringBuffer sb = new StringBuffer(3);
             sb.append('0').append(i);
             return sb.toString();
-        } else return String.valueOf(i);
+        } else {
+            return String.valueOf(i);
+        }
     }
 
 
@@ -1119,9 +534,15 @@ public final class Util {
 
     }
 
-    public static String getHTTPDateTimeString() {
-        Calendar c = Calendar.getInstance();
-        return "" + make2(c.get(Calendar.DAY_OF_MONTH)) + "." + make2(c.get(Calendar.MONTH) + 1) + "." + (c.get(Calendar.YEAR)) + " " + make2(c.get(Calendar.HOUR_OF_DAY)) + "." + make2(c.get(Calendar.MINUTE));
+    /**
+     * @return 20.11.2017 22:30
+     */
+    public static String getDateTimeStringInMsk() {
+        return HTTP_DATE_TIME_FORMATTER_MSK
+                .print(System.currentTimeMillis());
+
+        //Calendar c = Calendar.getInstance();
+        //return "" + make2(c.get(Calendar.DAY_OF_MONTH)) + "." + make2(c.get(Calendar.MONTH) + 1) + "." + (c.get(Calendar.YEAR)) + " " + make2(c.get(Calendar.HOUR_OF_DAY)) + "." + make2(c.get(Calendar.MINUTE));
 
     }
 
@@ -1158,127 +579,6 @@ public final class Util {
     }
 
 
-//  private static String urlDecode(String s, boolean flag) {
-//    char ac[] = s.toCharArray();
-//    StringBuffer stringbuffer = new StringBuffer();
-//    for(int i = 0; i < ac.length; i++)
-//      if(ac[i] == '%') {
-//      if(i >= ac.length - 2)
-//        break;
-//      char c = '\0';
-//      for(int j = 1; j <= 2; j++)
-//        c = (char)((c <<= '\004') + _aCI(ac[i + j]));
-//
-//      stringbuffer.append(c);
-//      i += 2;
-//      } else
-//        if(flag && ac[i] == '+')
-//          stringbuffer.append(' ');
-//        else
-//          stringbuffer.append(ac[i]);
-//
-//    return stringbuffer.toString();
-//  }
-//
-//  public static String _bStringvString(String s, boolean flag) {
-//    String s1 = urlDecode(s, flag);
-//    String as[] = {
-//      "amp;quot;", "amp;apos;", "amp;", "lt;", "gt;", "quot;", "apos;", "circ;", "tilde;", "nbsp;"
-//    };
-//    char ac[] = {
-//      '"', '\'', '&', '<', '>', '"', '\'', '^', '~', ' '
-//    };
-//    char ac1[] = s1.toCharArray();
-//    StringBuffer stringbuffer = new StringBuffer();
-//    label0:
-//      for(int i = 0; i < ac1.length; i++)
-//        if(ac1[i] == '&') {
-//        if(i >= ac1.length - 3)
-//          break;
-//        String s2 = s1.substring(i + 1);
-//        if(ac1[i + 1] == '#') {
-//          int j;
-//          if((j = s2.indexOf(';')) < 0)
-//            break;
-//          String s3 = s2.substring(1, j);
-//          try {
-//            char c = (char)Integer.parseInt(s3);
-//            stringbuffer.append(c);
-//          } catch(NumberFormatException _ex) {
-//            break;
-//          }
-//          i += j + 1;
-//          continue;
-//        }
-//        for(int k = 0; k < as.length; k++) {
-//          if(!s2.startsWith(as[k]))
-//            continue;
-//          stringbuffer.append(ac[k]);
-//          i += as[k].length();
-//          continue label0;
-//        }
-//
-//        stringbuffer.append(ac1[i]);
-//        } else {
-//        stringbuffer.append(ac1[i]);
-//        }
-//
-//      return stringbuffer.toString();
-//  }
-//	public static String toHexString(byte[] b)
-//	{
-//		StringBuffer sb = new StringBuffer(b.length * 2);
-//		for (int i = 0; i < b.length; i++)
-//		{
-//			//	look up high nibble char
-//			sb.append(hexChar[(b[i] & 0xf0) >>> 4]);
-//
-//			//	look up low nibble char
-//			sb.append(hexChar[b[i] & 0x0f]);
-//			sb.append(" ");
-//			if ((i != 0) && ((i % 15) == 0)) sb.append("\n");
-//		}
-//		return sb.toString();
-//	}
-//
-//	//	table to convert a nibble to a hex char.
-//	private static char[] hexChar = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
-//
-////
-//	// Extracts the byte from the buffer (buf) at position off
-//	public static int getByte(byte[] buf, int off)
-//	{
-//		int val;
-//		val = ((int) buf[off]) & 0x000000FF;
-//		return (val);
-//	}
-//
-//
-//	// Puts the specified byte (val) into the buffer (buf) at position off
-//	public static void putByte(byte[] buf, int off, int val)
-//	{
-//		buf[off] = (byte) (val & 0x000000FF);
-//	}
-//
-//
-//	// Extracts the word from the buffer (buf) at position off using the specified byte ordering (bigEndian)
-//	public static int getWord(byte[] buf, int off, boolean bigEndian)
-//	{
-//		int val;
-//		if (bigEndian)
-//		{
-//			val = (((int) buf[off]) << 8) & 0x0000FF00;
-//			val |= (((int) buf[++off])) & 0x000000FF;
-//		}
-//		else   // Little endian
-//		{
-//			val = (((int) buf[off])) & 0x000000FF;
-//			val |= (((int) buf[++off]) << 8) & 0x0000FF00;
-//		}
-//		return (val);
-//	}
-//
-
 
     public static final byte[] readStream(InputStream is) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream(30000);
@@ -1297,465 +597,6 @@ public final class Util {
     static public InputStream getInputStream(byte[] array) {
         return new ByteArrayInputStream(array);
     }
-//	static public int getWord(DataInputStream stream, boolean bigEndian) throws IOException
-//	{
-//		return bigEndian
-//				?
-//					stream.readUnsignedShort()
-//				:
-//					((int)stream.readByte()&0x00FF) | (((int)stream.readByte()<<8)&0xFF00);
-//	}
-//
-//	static public String readAsciiz(DataInputStream stream) throws IOException
-//	{
-//		int len = Util.getWord(stream, false);
-//		if (len == 0) return new String();
-//		byte[] buffer = new byte[len];
-//		stream.readFully(buffer);
-//		return Util.byteArrayToString(buffer);
-//	}
-//	static public void writeWord(ByteArrayOutputStream stream, int value, boolean bigEndian)
-//	{
-//		if (bigEndian)
-//		{
-//			stream.write(((value&0xFF00)>>8)&0xFF);
-//			stream.write(value&0xFF);
-//		}
-//		else
-//		{
-//			stream.write(value&0xFF);
-//			stream.write(((value&0xFF00)>>8)&0xFF);
-//		}
-//	}
-//	static public void writeByteArray(ByteArrayOutputStream stream, byte[] array)
-//	{
-//		try
-//		{
-//			stream.write(array);
-//		}
-//		catch (Exception e)
-//		{
-//			System.out.println("Util.writeByteArray: "+e.toString());
-//		}
-//	}
-//	static public void writeDWord(ByteArrayOutputStream stream, int value, boolean bigEndian)
-//	{
-//		if (bigEndian)
-//		{
-//			stream.write(((value&0xFF000000)>>24)&0xFF);
-//			stream.write(((value&0xFF0000)>>16)&0xFF);
-//			stream.write(((value&0xFF00)>>8)&0xFF);
-//			stream.write(value&0xFF);
-//		}
-//		else
-//		{
-//			stream.write(value&0xFF);
-//			stream.write(((value&0xFF00)>>8)&0xFF);
-//			stream.write(((value&0xFF0000)>>16)&0xFF);
-//			stream.write(((value&0xFF000000)>>24)&0xFF);
-//		}
-//	}
-//	static public void writeByte(ByteArrayOutputStream stream, int value)
-//	{
-//		stream.write(value);
-//	}
-//
-//	static public void writeLenAndString(ByteArrayOutputStream stream, String value, boolean utf8)
-//	{
-//		byte[] raw = Util.stringToByteArray(value, utf8);
-//		writeWord(stream, raw.length, true);
-//		stream.write(raw, 0, raw.length);
-//	}
-//
-//	static public void writeAsciizTLV(int type, ByteArrayOutputStream stream, String value)
-//	{
-//		writeWord(stream, type, true);
-//		byte[] raw = Util.stringToByteArray(value);
-//		writeWord(stream, raw.length+3, false);
-//		writeWord(stream, raw.length+1, false);
-//		stream.write(raw, 0, raw.length);
-//		stream.write(0);
-//	}
-//
-//	static public void writeTLV(int type, ByteArrayOutputStream stream, ByteArrayOutputStream data)
-//	{
-//		byte[] raw = data.toByteArray();
-//		writeWord(stream, type, true);
-//		writeWord(stream, raw.length, false);
-//		stream.write(raw, 0, raw.length);
-//	}
-//	// Extracts the word from the buffer (buf) at position off using big endian byte ordering
-//	public static int getWord(byte[] buf, int off)
-//	{
-//		return (Util.getWord(buf, off, true));
-//	}
-    // Puts the specified word (val) into the buffer (buf) at position off using the specified byte ordering (bigEndian)
-
-//	// Extracts the double from the buffer (buf) at position off using the specified byte ordering (bigEndian)
-//	public static long getDWord(byte[] buf, int off, boolean bigEndian)
-//	{
-//		long val;
-//		if (bigEndian)
-//		{
-//			val = (((long) buf[off]) << 24) & 0xFF000000;
-//			val |= (((long) buf[++off]) << 16) & 0x00FF0000;
-//			val |= (((long) buf[++off]) << 8) & 0x0000FF00;
-//			val |= (((long) buf[++off])) & 0x000000FF;
-//		}
-//		else   // Little endian
-//		{
-//			val = (((long) buf[off])) & 0x000000FF;
-//			val |= (((long) buf[++off]) << 8) & 0x0000FF00;
-//			val |= (((long) buf[++off]) << 16) & 0x00FF0000;
-//			val |= (((long) buf[++off]) << 24) & 0xFF000000;
-//		}
-//		return (val);
-//	}
-//	// Extracts the double from the buffer (buf) at position off using big endian byte ordering
-//	public static long getDWord(byte[] buf, int off)
-//	{
-//		return (Util.getDWord(buf, off, true));
-//	}
-//	// Puts the specified double (val) into the buffer (buf) at position off using the specified byte ordering (bigEndian)
-//	public static void putDWord(byte[] buf, int off, long val, boolean bigEndian)
-//	{
-//		if (bigEndian)
-//		{
-//			buf[off] = (byte) ((val >> 24) & 0x00000000000000FF);
-//			buf[++off] = (byte) ((val >> 16) & 0x00000000000000FF);
-//			buf[++off] = (byte) ((val >> 8) & 0x00000000000000FF);
-//			buf[++off] = (byte) ((val) & 0x00000000000000FF);
-//		}
-//		else   // Little endian
-//		{
-//			buf[off] = (byte) ((val) & 0x00000000000000FF);
-//			buf[++off] = (byte) ((val >> 8) & 0x00000000000000FF);
-//			buf[++off] = (byte) ((val >> 16) & 0x00000000000000FF);
-//			buf[++off] = (byte) ((val >> 24) & 0x00000000000000FF);
-//		}
-//	}
-//
-//
-//	// Puts the specified double (val) into the buffer (buf) at position off using big endian byte ordering
-//	public static void putDWord(byte[] buf, int off, long val)
-//	{
-//		Util.putDWord(buf, off, val, true);
-//	}
-//	// getTlv(byte[] buf, int off) => byte[]
-//	public static byte[] getTlv(byte[] buf, int off)
-//	{
-//		if (off + 4 > buf.length) return (null);   // Length check (#1)
-//		int length = Util.getWord(buf, off + 2);
-//		if (off + 4 + length > buf.length) return (null);   // Length check (#2)
-//		byte[] value = new byte[length];
-//		System.arraycopy(buf, off + 4, value, 0, length);
-//		return (value);
-//	}
-    // Extracts a string from the buffer (buf) starting at position off, ending at position off+len
-
-//	// Extracts a string from the buffer (buf) starting at position off, ending at position off+len
-//	public static String byteArrayToString1251(byte[] buf, int off, int len)
-//	{
-//		return (Util.byteArrayToString(buf, off, len, false));
-//	}
-    // Converts the specified buffer (buf) to a string
-
-//	// Converts the specified buffer (buf) to a string
-//	public static String byteArrayToString(byte[] buf)
-//	{
-//		return (Util.byteArrayToString(buf, 0, buf.length, false));
-//	}
-//	// Converts the specific 4 byte max buffer to an unsigned long
-//	public static long byteArrayToLong(byte[] b)
-//	{
-//		long l = 0;
-//	    l |= b[0] & 0xFF;
-//	    l <<= 8;
-//	    l |= b[1] & 0xFF;
-//	    l <<= 8;
-//	    if (b.length > 3)
-//		{
-//			l |= b[2] & 0xFF;
-//			l <<= 8;
-//			l |= b[3] & 0xFF;
-//		}
-//	    return l;
-//	}
-//	// Converts a byte array to a hex string
-//    public static String byteArrayToHexString(byte[] buf) {
-//        StringBuffer hexString = new StringBuffer(buf.length);
-//        String hex;
-//        for (int i = 0; i < buf.length; i++) {
-//            hex = Integer.toHexString(0x0100 + (buf[i] & 0x00FF)).substring(1);
-//            hexString.append((hex.length() < 2 ? "0" : "") + hex);
-//        }
-//        return hexString.toString();
-//    }
-
-//	// Converts the specified string (val) to a byte array
-//	public static byte[] stringToByteArray(String val)
-//	{
-//		return (Util.stringToByteArray(val, false));
-//	}
-//
-//
-//	// Converts the specified string to UCS-2BE
-//	public static byte[] stringToUcs2beByteArray(String val)
-//	{
-//		byte[] ucs2be = new byte[val.length() * 2];
-//		for (int i = 0; i < val.length(); i++)
-//		{
-//			Util.putWord(ucs2be, i * 2, (int) val.charAt(i));
-//		}
-//		return (ucs2be);
-//	}
-//	// Extract a UCS-2BE string from the specified buffer (buf) starting at position off, ending at position off+len
-//	public static String ucs2beByteArrayToString(byte[] buf, int off, int len)
-//	{
-//
-//		// Length check
-//		if ((off + len > buf.length) || (buf.length % 2 != 0))
-//		{
-//			return (null);
-//		}
-//
-//		// Convert
-//		StringBuffer sb = new StringBuffer();
-//		for (int i = off; i < off+len; i += 2)
-//		{
-//			sb.append((char) Util.getWord(buf, i));
-//		}
-//		return (sb.toString());
-//
-//	}
-//	// Extracts a UCS-2BE string from the specified buffer (buf)
-//	public static String ucs2beByteArrayToString(byte[] buf)
-//	{
-//		return (Util.ucs2beByteArrayToString(buf, 0, buf.length));
-//	}
-//	public static void showBytes(byte[] data)
-//	{
-//		StringBuffer buffer1 = new StringBuffer(), buffer2 = new StringBuffer();
-//
-//		for (int i = 0; i < data.length; i++)
-//		{
-//			int charaster = ((int)data[i])&0xFF;
-//			buffer1.append(charaster < ' ' || charaster >= 128 ? '.' : (char)charaster);
-//			String hex = Integer.toHexString(((int)data[i])&0xFF);
-//			buffer2.append(hex.length() == 1 ? "0"+hex : hex);
-//			buffer2.append(" ");
-//
-//			if (((i%16) == 15) || (i == (data.length-1)))
-//			{
-//				while (buffer2.length() < 16*3) buffer2.append(' ');
-//				System.out.print(buffer2.toString());
-//				System.out.println(buffer1.toString());
-//
-//				buffer1.setLength(0);
-//				buffer2.setLength(0);
-//			}
-//		}
-//		System.out.println();
-//	}
-//	// Removes all CR occurences
-//	public static String removeCr(String val)
-//	{
-//		StringBuffer result = new StringBuffer();
-//		for (int i = 0; i < val.length(); i++)
-//		{
-//			char chr = val.charAt(i);
-//			if ((chr == 0) || (chr == '\r')) continue;
-//			result.append(chr);
-//		}
-//		return result.toString();
-//	}
-//
-//
-//	public static String removeClRfAndTabs(String val)
-//	{
-//		int len = val.length();
-//		char[] dst = new char[len];
-//		for (int i = 0; i < len; i++)
-//		{
-//			char chr = val.charAt(i);
-//			if ((chr == '\n') || (chr == '\r') || (chr == '\t')) chr = ' ';
-//			dst[i] = chr;
-//		}
-//		return new String(dst, 0, len);
-//	}
-//	// Compare to byte arrays (return true if equals, false otherwise)
-//	public static boolean byteArrayEquals(byte[] buf1, int off1, byte[] buf2, int off2, int len)
-//	{
-//
-//		// Length check
-//		if ((off1 + len > buf1.length) || (off2 + len > buf2.length))
-//		{
-//			return (false);
-//		}
-//
-//		// Compare bytes, stop at first mismatch
-//		for (int i = 0; i < len; i++)
-//		{
-//			if (buf1[off1 + i] != buf2[off2 + i])
-//			{
-//				return (false);
-//			}
-//		}
-//
-//		// Return true if this point is reached
-//		return (true);
-//
-//	}
-//
-//	//  If the numer has only one digit add a 0
-//	public static String makeTwo(int number)
-//	{
-//		if (number < 10)
-//		{
-//			return ("0" + String.valueOf(number));
-//		}
-//		else
-//		{
-//			return (String.valueOf(number));
-//		}
-//	}
-//
-    // #sijapp cond.end #
-//
-//    // Check is data array utf-8 string
-//    public static boolean isDataUTF8(byte[] array, int start, int lenght)
-//    {
-//        if (lenght == 0) return false;
-//        if (array.length < (start + lenght)) return false;
-//
-//        for (int i = start, len = lenght; len > 0;)
-//        {
-//            int seqLen = 0;
-//            byte bt = array[i++];
-//            len--;
-//
-//            if      ((bt&0xE0) == 0xC0) seqLen = 1;
-//            else if ((bt&0xF0) == 0xE0) seqLen = 2;
-//            else if ((bt&0xF8) == 0xF0) seqLen = 3;
-//            else if ((bt&0xFC) == 0xF8) seqLen = 4;
-//            else if ((bt&0xFE) == 0xFC) seqLen = 5;
-//
-//            if (seqLen == 0)
-//            {
-//                if ((bt&0x80) == 0x80) return false;
-//                else continue;
-//            }
-//
-//            for (int j = 0; j < seqLen; j++)
-//            {
-//                if (len == 0) return false;
-//                bt = array[i++];
-//                if ((bt&0xC0) != 0x80) return false;
-//                len--;
-//            }
-//            if (len == 0) break;
-//        }
-//        return true;
-//    }
-//	// Returns String value of cost value
-//	public static String intToDecimal(int value)
-//	{
-//		String costString = "";
-//		String afterDot = "";
-//		try
-//		{
-//			if (value != 0) {
-//				costString = Integer.toString(value / 1000) + ".";
-//				afterDot = Integer.toString(value % 1000);
-//				while (afterDot.length() != 3)
-//				{
-//					afterDot = "0" + afterDot;
-//				}
-//				while ((afterDot.endsWith("0")) && (afterDot.length() > 2))
-//				{
-//					afterDot = afterDot.substring(0, afterDot.length() - 1);
-//				}
-//				costString = costString + afterDot;
-//				return costString;
-//			}
-//			else
-//			{
-//				return new String("0.0");
-//			}
-//		}
-//		catch (Exception e)
-//		{
-//			return new String("0.0");
-//		}
-//	}
-//
-//	// Extracts the number value form String
-//	public static int decimalToInt(String string)
-//	{
-//		int value = 0;
-//		byte i = 0;
-//		char c = new String(".").charAt(0);
-//		try
-//		{
-//			for (i = 0; i < string.length(); i++)
-//			{
-//				if (c != string.charAt(i))
-//				{
-//					break;
-//				}
-//			}
-//			if (i == string.length()-1)
-//			{
-//				value = Integer.parseInt(string) * 1000;
-//				return (value);
-//			}
-//			else
-//			{
-//				while (c != string.charAt(i))
-//				{
-//					i++;
-//				}
-//				value = Integer.parseInt(string.substring(0, i)) * 1000;
-//				string = string.substring(i + 1, string.length());
-//				while (string.length() > 3)
-//				{
-//					string = string.substring(0, string.length() - 1);
-//				}
-//				while (string.length() < 3)
-//				{
-//					string = string + "0";
-//				}
-//				value = value + Integer.parseInt(string);
-//				return value;
-//			}
-//		}
-//		catch (Exception e)
-//		{
-//			return (0);
-//		}
-//	}
-    // Converts an Unicode string into CP1251 byte array
-
-
-//	static public int strToIntDef(String str, int defValue)
-//	{
-//		if (str == null) return defValue;
-//		int result = defValue;
-//		try
-//		{
-//			result = Integer.parseInt(str);
-//		}
-//		catch (Exception e) {}
-//		return result;
-//	}
-//
-//
-//	static public String replaceStr(String original, String from, String to)
-//	{
-//		int index = original.indexOf(from);
-//		if (index == -1) return original;
-//		return original.substring(0, index)+to+original.substring(index+from.length(), original.length());
-//	}
 
 
     static final char[] charTab =
@@ -1893,41 +734,41 @@ public final class Util {
     }
 
 
-     public final static String urlEncodeUnicode(String paramValue) {
-        byte[] ba=Util.stringToByteArray(paramValue, true);
-        StringBuffer sb=new StringBuffer(30);
+    public final static String urlEncodeUnicode(String paramValue) {
+        byte[] ba = Util.stringToByteArray(paramValue, true);
+        StringBuffer sb = new StringBuffer(30);
         int c;
-        for (int i=0; i<ba.length; i++) {
-            c=ba[i];
+        for (int i = 0; i < ba.length; i++) {
+            c = ba[i];
             sb.append((char) (c));
         }
         return urlEncodeStringAll(sb.toString());
     }
 
     public final static String urlEncodeStringAll(String url) {
-            StringBuffer stringbuffer=new StringBuffer();
-            for (int i=0; i<url.length(); i++) {
-                char c=url.charAt(i);
-                switch (c) {
-                    case 32: // ' '
-                    case 38: // '&'
-                    case 40: // '('
-                    case 41: // ')'
-                    case 58: // ':'
-                    case 63: // '?'
-                    case 64: // '@'
+        StringBuffer stringbuffer = new StringBuffer();
+        for (int i = 0; i < url.length(); i++) {
+            char c = url.charAt(i);
+            switch (c) {
+                case 32: // ' '
+                case 38: // '&'
+                case 40: // '('
+                case 41: // ')'
+                case 58: // ':'
+                case 63: // '?'
+                case 64: // '@'
+                    stringbuffer.append('%'); // Add % character
+                    stringbuffer.append(toHexChar((c & 0xF0) >> 4));
+                    stringbuffer.append(toHexChar(c & 0x0F));
+                    break;
+                default:
+                    if ((c < 0x7b) && (c > 32)) {
+                        stringbuffer.append(c);
+                    } else {
                         stringbuffer.append('%'); // Add % character
-                        stringbuffer.append(toHexChar((c&0xF0)>>4));
-                        stringbuffer.append(toHexChar(c&0x0F));
-                        break;
-                    default:
-                        if ((c<0x7b)&&(c>32)){
-                            stringbuffer.append(c);
-                        } else {
-                            stringbuffer.append('%'); // Add % character
-                            stringbuffer.append(toHexChar((c&0xF0)>>4));
-                            stringbuffer.append(toHexChar(c&0x0F));
-                        }
+                        stringbuffer.append(toHexChar((c & 0xF0) >> 4));
+                        stringbuffer.append(toHexChar(c & 0x0F));
+                    }
 //          else {
 //          stringbuffer.append('%'); // Add % character
 //          stringbuffer.append(toHexChar((c & 0xF000) >> 12));
@@ -1935,11 +776,11 @@ public final class Util {
 //          stringbuffer.append(toHexChar((c & 0xF0) >> 4));
 //          stringbuffer.append(toHexChar(c & 0x0F));
 //          }
-                        break;
-                }
+                    break;
             }
-
-            return stringbuffer.toString();
         }
+
+        return stringbuffer.toString();
+    }
 
 }

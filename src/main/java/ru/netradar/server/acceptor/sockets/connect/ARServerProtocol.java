@@ -157,8 +157,7 @@ public class ARServerProtocol {
 
                         byte[] sbytes = new byte[size];
                         data.readFully(sbytes);
-                        //String sb = Util.getHTTPDateTimeString()+" "+Util.byteArrayUTFToString(sbytes).trim();
-                        String sb = Util.getHTTPDateTimeString() + " " + Util.byteArrayToString(sbytes, false).trim();
+                        String sb = Util.getDateTimeStringInMsk() + " " + Util.byteArrayToString(sbytes, false).trim();
                         sb = sb.replace('\'', ' ');
                         LOG.debug("artal sent msg " + sb);
                         boolean replaced = true;
@@ -192,8 +191,8 @@ public class ARServerProtocol {
                         long adt = System.currentTimeMillis();
                         adt = readTimeFromStream(data, adt);
                         data.readFully(sbytes);
-                        //String sb = Util.getHTTPDateTimeString()+" "+Util.byteArrayUTFToString(sbytes).trim();
-                        String sb = Util.getHTTPDateTimeString() + " " + Util.byteArrayToString(sbytes, false).trim();
+                        //String sb = Util.getDateTimeStringInMsk()+" "+Util.byteArrayUTFToString(sbytes).trim();
+                        String sb = Util.getDateTimeStringInMsk() + " " + Util.byteArrayToString(sbytes, false).trim();
                         sb = sb.replace('\'', ' ');
                         LOG.debug("artal sent msg " + sb);
                         boolean replaced = true;
