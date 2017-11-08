@@ -9,6 +9,7 @@ import ru.netradar.server.queue.dao.Task;
 import ru.netradar.server.queue.dao.TaskStorage;
 
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Выбиратель заданий
@@ -23,6 +24,7 @@ public abstract class QueueDaemon<T extends Task> {
     private final Runnable thrdRunnable;
     private final Thread[] thrds;
     private final String shortName;
+    private final AtomicBoolean first = new AtomicBoolean();
 
     public QueueDaemon(final TransactionTemplate txTemplate,
                        final TaskStorage<T> taskStorage, final TaskExecutor<T> executor,
@@ -62,7 +64,9 @@ public abstract class QueueDaemon<T extends Task> {
             public void run() {
                 final String threadName = "TaskFetch-" + Thread.currentThread().getName();
                 try {
-                    Thread.sleep(5000 + ThreadLocalRandom.current().nextInt(10000));
+                    if (!first.compareAndSet(false, true)) {//start one thread immediately
+                        Thread.sleep(5000 + ThreadLocalRandom.current().nextInt(10000));
+                    }
                 } catch (InterruptedException e) {
                     LOG.warn("Interrupted", e);
                     return;
