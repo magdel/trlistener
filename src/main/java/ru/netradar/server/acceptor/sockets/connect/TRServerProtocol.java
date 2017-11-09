@@ -30,16 +30,12 @@ public class TRServerProtocol {
     TRLocThread servThread;
     private final DeviceStorage deviceStorage;
     private static final String UTC = "UTC";
-    private final Calendar calUTC;
 
 
     public TRServerProtocol(TRLocThread servThread, WebMonitorProperties settings, DeviceStorage deviceStorage) {
         this.servThread = servThread;
         this.deviceStorage = deviceStorage;
         userCheckUrl = settings.getUsercheckurl();
-        calUTC = Calendar.getInstance(TimeZone.getTimeZone(UTC));
-        long millis = System.currentTimeMillis();
-        calUTC.setTimeInMillis(millis - (millis % 1000));
     }
 
     String userCheckUrl;
@@ -207,7 +203,11 @@ public class TRServerProtocol {
      * @param gpsTime строка время GPS
      * @return дату как long
      */
-    public long decodeGPSTime(String gpsDate, String gpsTime) {
+    public static long decodeGPSTime(String gpsDate, String gpsTime) {
+        Calendar calUTC = Calendar.getInstance(TimeZone.getTimeZone(UTC));
+        long millis = System.currentTimeMillis();
+        calUTC.setTimeInMillis(millis - (millis % 1000));
+
         int valPos = 4;
         calUTC.set(Calendar.YEAR, 2000 + (gpsDate.charAt(valPos) - '0') * 10 + (gpsDate.charAt(valPos + 1) - '0'));
         valPos = 2;
