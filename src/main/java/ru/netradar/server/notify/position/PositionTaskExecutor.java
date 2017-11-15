@@ -6,7 +6,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 import ru.netradar.config.properties.DeleteMonitorProperties;
 import ru.netradar.config.properties.PositionQueueProperties;
 import ru.netradar.server.device.NRDevice;
-import ru.netradar.server.device.NRLocation;
+import ru.netradar.server.bus.domain.NRLocation;
 import ru.netradar.server.http.SiteClient;
 import ru.netradar.server.queue.TaskExecutor;
 import ru.netradar.server.queue.dao.TaskDAO;

@@ -6,7 +6,7 @@ import reactor.core.Cancellation;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
 import reactor.core.scheduler.Schedulers;
-import ru.netradar.server.device.NRLocation;
+import ru.netradar.server.bus.domain.NRLocation;
 
 import java.util.Optional;
 import java.util.function.Consumer;

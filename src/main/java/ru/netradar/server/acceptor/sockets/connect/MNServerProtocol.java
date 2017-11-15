@@ -13,7 +13,7 @@ import org.apache.log4j.Logger;
 import ru.netradar.config.properties.WebMonitorProperties;
 import ru.netradar.server.acceptor.MNProtocol;
 import ru.netradar.server.device.NRDevice;
-import ru.netradar.server.device.NRLocation;
+import ru.netradar.server.bus.domain.NRLocation;
 import ru.netradar.server.device.NRObject;
 import ru.netradar.server.storage.DeviceStorage;
 import ru.netradar.util.MD5;

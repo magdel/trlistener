@@ -10,7 +10,7 @@ package ru.netradar.server.dao;
 
 import org.apache.log4j.Logger;
 import ru.netradar.server.device.NRDevice;
-import ru.netradar.server.device.NRLocation;
+import ru.netradar.server.bus.domain.NRLocation;
 import ru.netradar.server.diag.DiagInformation;
 import ru.netradar.server.diag.DiagStatus;
 import ru.netradar.server.storage.DeviceDao;

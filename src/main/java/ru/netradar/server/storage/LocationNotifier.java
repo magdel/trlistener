@@ -1,7 +1,7 @@
 package ru.netradar.server.storage;
 
 import ru.netradar.server.device.NRDevice;
-import ru.netradar.server.device.NRLocation;
+import ru.netradar.server.bus.domain.NRLocation;
 
 /**
  * Уведомитель координат

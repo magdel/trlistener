@@ -9,6 +9,7 @@
 package ru.netradar.server.device;
 
 import org.apache.log4j.Logger;
+import ru.netradar.server.bus.domain.NRLocation;
 import ru.netradar.server.device.notify.NotifyInfo;
 import ru.netradar.server.device.notify.Recipient;
 

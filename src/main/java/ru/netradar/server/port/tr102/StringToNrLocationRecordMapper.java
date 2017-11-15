@@ -4,7 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.netradar.server.acceptor.sockets.connect.TRServerProtocol;
 import ru.netradar.server.device.NRDevice;
-import ru.netradar.server.device.NRLocation;
+import ru.netradar.server.bus.domain.NRLocation;
 import ru.netradar.util.Util;
 import ru.netradar.utils.IdGenerator;
 

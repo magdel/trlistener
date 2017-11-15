@@ -2,19 +2,19 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package ru.netradar.server.device;
+package ru.netradar.server.bus.domain;
 
 /**
  * @author rfk
  */
 public class NRLocation {
 
-    int _lat; //mul by 100000;
-    int _lon; //mul by 100000;
-    short _alt;
-    short _spd;  //multiplyed by 10
-    short _crs;
-    long _dt;
+    final int _lat; //mul by 100000;
+    final int _lon; //mul by 100000;
+    final short _alt;
+    final short _spd;  //multiplyed by 10
+    final short _crs;
+    final long _dt;
 
     public NRLocation(int lat, int lon, short alt, short spd, short crs, long dt) {
         _lat = lat; //mul by 100000;
@@ -26,6 +26,7 @@ public class NRLocation {
     }
 
     public NRLocation() {
+        this(0,0,(short)0,(short)0,(short)0,0);
     }
 
     public NRLocation clone() {

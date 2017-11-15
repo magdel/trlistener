@@ -13,7 +13,7 @@ import ru.netradar.config.properties.WebMonitorProperties;
 import ru.netradar.server.acceptor.MNProtocol;
 import ru.netradar.server.acceptor.sockets.LocThread;
 import ru.netradar.server.device.NRDevice;
-import ru.netradar.server.device.NRLocation;
+import ru.netradar.server.bus.domain.NRLocation;
 import ru.netradar.server.storage.DeviceStorage;
 
 import java.io.*;

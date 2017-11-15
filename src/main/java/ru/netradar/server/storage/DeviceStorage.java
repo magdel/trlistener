@@ -6,7 +6,7 @@ import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
 import ru.netradar.config.properties.WebMonitorProperties;
 import ru.netradar.server.device.NRDevice;
-import ru.netradar.server.device.NRLocation;
+import ru.netradar.server.bus.domain.NRLocation;
 import ru.netradar.server.device.NRObject;
 import ru.netradar.server.diag.DiagInformation;
 import ru.netradar.server.diag.DiagStatus;
