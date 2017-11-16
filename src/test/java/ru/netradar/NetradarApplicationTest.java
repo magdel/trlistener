@@ -69,9 +69,23 @@ public class NetradarApplicationTest extends AbstractTestNGSpringContextTests {
 
     }
 
+    @Test
+    public void shouldAcceptTR102NewPortString() throws Exception {
+        String s = "$355632000166323,1,2,040202,093633,E12129.2252,N2459.8891,00161,0.0100,147,07*37!\n";
+        sendAsyncTR102TCPString(s);
+        Thread.sleep(1000);
+        // Assert.assertEquals(httpConsumer.getAcceptCount(), 3);
+       // Assert.assertEquals(TRLocThread.tryCount, 1);
+
+    }
 
     private void sendTR102TCPString(String s) throws IOException, InterruptedException {
         int port = Integer.parseInt(environment.getProperty("acceptor.portTr102"));
+        sendLocalhostTCPString(s, port);
+    }
+
+    private void sendAsyncTR102TCPString(String s) throws IOException, InterruptedException {
+        int port = Integer.parseInt(environment.getProperty("acceptor.portAsyncTr102"));
         sendLocalhostTCPString(s, port);
     }
 
@@ -80,6 +94,7 @@ public class NetradarApplicationTest extends AbstractTestNGSpringContextTests {
         OutputStream outputStream = socket.getOutputStream();
         outputStream.write(s.getBytes());
         outputStream.flush();
+        Thread.sleep(1000);
         outputStream.close();
         socket.close();
     }

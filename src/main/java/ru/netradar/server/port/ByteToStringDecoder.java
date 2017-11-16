@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * Created by rfk on 08.11.2017.
  */
-class ByteToStringDecoder extends ByteToMessageDecoder { // (1)
+public class ByteToStringDecoder extends ByteToMessageDecoder { // (1)
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) { // (2)
         ByteBuf byteBuf = in.readBytes(in.readableBytes());

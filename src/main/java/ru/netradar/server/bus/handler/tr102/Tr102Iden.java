@@ -1,4 +1,4 @@
-package ru.netradar.server.bus.handler;
+package ru.netradar.server.bus.handler.tr102;
 
 import javax.annotation.Nonnull;
 import java.util.Objects;
@@ -16,6 +16,25 @@ public class Tr102Iden {
     @Nonnull
     public String getImei() {
         return imei;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        Tr102Iden tr102Iden = (Tr102Iden) o;
+
+        return imei.equals(tr102Iden.imei);
+    }
+
+    @Override
+    public int hashCode() {
+        return imei.hashCode();
     }
 
     @Override

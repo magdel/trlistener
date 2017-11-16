@@ -31,6 +31,17 @@ public class AcceptorProperties {
     @NotNull
     private Integer portViewer;
 
+    @NotNull
+    private Integer portAsyncTr102;
+
+    public Integer getPortAsyncTr102() {
+        return portAsyncTr102;
+    }
+
+    public void setPortAsyncTr102(Integer portAsyncTr102) {
+        this.portAsyncTr102 = portAsyncTr102;
+    }
+
     public Integer getPortMapnav() {
         return portMapnav;
     }

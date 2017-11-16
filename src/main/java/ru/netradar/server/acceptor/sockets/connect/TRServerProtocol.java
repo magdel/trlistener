@@ -35,7 +35,7 @@ public class TRServerProtocol {
     public TRServerProtocol(TRLocThread servThread, WebMonitorProperties settings, DeviceStorage deviceStorage) {
         this.servThread = servThread;
         this.deviceStorage = deviceStorage;
-        userCheckUrl = settings.getUsercheckurl();
+        this.userCheckUrl = settings.getUsercheckurl();
     }
 
     String userCheckUrl;

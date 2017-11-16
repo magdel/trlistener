@@ -3,8 +3,8 @@ package ru.netradar.server.port.tr102;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.netradar.server.acceptor.sockets.connect.TRServerProtocol;
-import ru.netradar.server.device.NRDevice;
 import ru.netradar.server.bus.domain.NRLocation;
+import ru.netradar.server.bus.handler.tr102.Tr102Iden;
 import ru.netradar.util.Util;
 import ru.netradar.utils.IdGenerator;
 
@@ -14,7 +14,7 @@ import java.util.function.Function;
 /**
  * Created by rfk on 18.11.2016.
  */
-public class StringToNrLocationRecordMapper implements Function<String, Optional<NRLocation>> {
+public class StringToNrLocationRecordMapper implements Function<String, Optional<Tr102Message>> {
     private static final Logger log = LoggerFactory.getLogger(StringToNrLocationRecordMapper.class);
 
     static String sep_comma = ",";
@@ -28,7 +28,7 @@ public class StringToNrLocationRecordMapper implements Function<String, Optional
     }
 
     @Override
-    public Optional<NRLocation> apply(String trackString) {
+    public Optional<Tr102Message> apply(String trackString) {
         try {
             return convertTr102(trackString, idGenerator);
         } catch (Exception ex) {
@@ -37,7 +37,7 @@ public class StringToNrLocationRecordMapper implements Function<String, Optional
         }
     }
 
-    private static Optional<NRLocation> convertTr102(String trackString, IdGenerator idGenerator) {
+    private static Optional<Tr102Message> convertTr102(String trackString, IdGenerator idGenerator) {
         //STX,Id-112233,$GPRMC,112842.000,A,6000.5274,N,03021.3429,E,0.00,0.00,241214,,,A*6C,F,,imei:013226008424265,03,23.0,Battery=70%,,0,250,02,1E82,173D;36
 
         String s = trackString;
@@ -56,7 +56,6 @@ public class StringToNrLocationRecordMapper implements Function<String, Optional
             }
             errpos = 3.1f;
 
-            NRDevice user;
 
             errpos = 14;
             if (info[1].equals(S_2) || info[1].equals(S_3) || info[2].equals(S_1)) {
@@ -97,7 +96,12 @@ public class StringToNrLocationRecordMapper implements Function<String, Optional
 
             //log.info("Authorized at " + (new Date()) + " with GPS date " + new Date(dt) + " delay " + (System.currentTimeMillis() - dt) + "ms");
 
-            return Optional.of(new NRLocation(lat, lon, alt, spd, crs, dt));
+            return Optional.of(
+                    new Tr102Message(
+                            new Tr102Iden(imei),
+                            new NRLocation(lat, lon, alt, spd, crs, dt)
+                    )
+            );
         } catch (RuntimeException exc) {
             log.error("On parse: text={}", s, exc);
             return Optional.empty();

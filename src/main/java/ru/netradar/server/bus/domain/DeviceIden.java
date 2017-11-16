@@ -37,6 +37,30 @@ public final class DeviceIden {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        DeviceIden that = (DeviceIden) o;
+
+        if (!userId.equals(that.userId)) {
+            return false;
+        }
+        return userType == that.userType;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = userId.hashCode();
+        result = 31 * result + userType.hashCode();
+        return result;
+    }
+
+    @Override
     public String toString() {
         return "DeviceIden{" +
                 "userId=" + userId +
