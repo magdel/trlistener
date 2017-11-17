@@ -84,6 +84,10 @@ public final class DeviceIden {
         public Integer getCode() {
             return code;
         }
+
+        public byte getAsByte(){
+            return code.byteValue();
+        }
     }
 
 

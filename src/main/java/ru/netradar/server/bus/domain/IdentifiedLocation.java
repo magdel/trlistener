@@ -28,4 +28,12 @@ public class IdentifiedLocation implements IdentifiedLocationable {
     public DeviceIden getDeviceIden() {
         return deviceIden;
     }
+
+    @Override
+    public String toString() {
+        return "IdentifiedLocation{" +
+                "location=" + location +
+                ", deviceIden=" + deviceIden +
+                '}';
+    }
 }
