@@ -89,6 +89,7 @@ public class PositionTaskExecutor implements TaskExecutor<PositionTask>, Locatio
                 device.userId, device.userType,
                 location.lat(), location.lon(), location.alt(), location.rspd(), location.crs(),
                 new Timestamp(location.dt()));
+        LOG.info("Position task: id={}", task.getId());
         positionTaskTaskDAO.storeTask(task);
     }
 }
