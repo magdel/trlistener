@@ -10,6 +10,11 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.LineBasedFrameDecoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import reactor.core.publisher.FluxSink;
+import ru.netradar.server.port.tr102.Tr102StringHandler;
+import ru.netradar.utils.IdGenerator;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Created by rfk on 15.11.2016.
@@ -18,19 +23,25 @@ public class TCPServer {
     private static final Logger logger = LoggerFactory.getLogger(TCPServer.class);
 
     private final int port;
+    private final FluxSink<String> stringFluxSink;
     private final ChannelHandlerAdapter[] channelHandlerAdapters;
     private final ServerLoopGroup serverLoopGroup;
     private final boolean linebasedDelimiter;
+    private final IdGenerator idGenerator;
     private ChannelFuture channelFuture;
 
     public TCPServer(int port,
                      ServerLoopGroup serverLoopGroup,
                      boolean linebasedDelimiter,
+                     IdGenerator idGenerator,
+                     FluxSink<String> stringFluxSink,
                      ChannelHandlerAdapter... channelHandlerAdapters) {
         this.port = port;
+        this.stringFluxSink = stringFluxSink;
         this.channelHandlerAdapters = channelHandlerAdapters;
         this.serverLoopGroup = serverLoopGroup;
         this.linebasedDelimiter = linebasedDelimiter;
+        this.idGenerator = checkNotNull(idGenerator);
     }
 
     public void init() {
@@ -48,6 +59,9 @@ public class TCPServer {
                             }
                             ch.pipeline()
                                     .addLast(channelHandlerAdapters);
+                            ch.pipeline()
+                                    .addLast("Tr102String",
+                                            new Tr102StringHandler(idGenerator, stringFluxSink));
                         }
                     })
                     .option(ChannelOption.SO_LINGER, 0)

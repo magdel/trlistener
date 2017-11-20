@@ -76,7 +76,6 @@ public class NetradarApplicationTest extends AbstractTestNGSpringContextTests {
         Thread.sleep(1000);
         // Assert.assertEquals(httpConsumer.getAcceptCount(), 3);
        // Assert.assertEquals(TRLocThread.tryCount, 1);
-
     }
 
     private void sendTR102TCPString(String s) throws IOException, InterruptedException {
