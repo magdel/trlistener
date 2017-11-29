@@ -2,6 +2,8 @@ package ru.netradar.server.port.tr102;
 
 import io.netty.channel.ChannelHandlerContext;
 import reactor.core.publisher.FluxSink;
+import ru.netradar.server.port.ConnectionData;
+import ru.netradar.server.port.ConnectionRegistry;
 import ru.netradar.utils.IdGenerator;
 import ru.netradar.utils.Utils;
 
@@ -16,12 +18,13 @@ import java.util.concurrent.atomic.AtomicLong;
 public class Tr102StringHandler extends BaseAdapter {
 
     private final AtomicLong readCounter = new AtomicLong();
-    private final FluxSink<String> stringFluxSink;
+    private final FluxSink<ConnectionData<String>> stringFluxSink;
     private String devImei = "";
 
     public Tr102StringHandler(IdGenerator idGenerator,
-                              FluxSink<String> stringFluxSink) {
-        super(idGenerator);
+                              FluxSink<ConnectionData<String>> stringFluxSink,
+                              ConnectionRegistry connectionRegistry) {
+        super(idGenerator, connectionRegistry);
         this.stringFluxSink = stringFluxSink;
     }
 
@@ -39,7 +42,11 @@ public class Tr102StringHandler extends BaseAdapter {
         if (stringFluxSink != null) {
             long count = readCounter.incrementAndGet();
             log.info("Read: id={}, count={}, msg={}", getIdentificationString(), count, trackerMessage);
-            stringFluxSink.next(trackerMessage);
+            stringFluxSink.next(new ConnectionData<>(
+                    getId(),
+                    getDeviceIden(),
+                    trackerMessage
+            ));
         } else {
             log.warn("No emitter");
         }

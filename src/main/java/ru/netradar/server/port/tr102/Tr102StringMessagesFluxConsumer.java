@@ -7,6 +7,8 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
 import reactor.core.scheduler.Schedulers;
 import ru.netradar.server.bus.handler.tr102.Tr102MessageConsumer;
+import ru.netradar.server.port.ConnectionData;
+import ru.netradar.server.port.ConnectionIdHolder;
 
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -16,7 +18,7 @@ import java.util.function.Consumer;
  */
 public class Tr102StringMessagesFluxConsumer {
     private static final Logger logger = LoggerFactory.getLogger(Tr102StringMessagesFluxConsumer.class);
-    private final Consumer<FluxSink<String>> stringEmitterConsumer;
+    private final Consumer<FluxSink<ConnectionData<String>>> stringEmitterConsumer;
     private final Tr102MessageConsumer tr102MessageConsumer;
     private final StringToNrLocationRecordMapper mapper;
     private Cancellation cancellation;

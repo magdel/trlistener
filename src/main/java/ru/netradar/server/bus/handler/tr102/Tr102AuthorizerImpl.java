@@ -26,9 +26,9 @@ public class Tr102AuthorizerImpl implements Tr102Authorizer {
 
     public Tr102AuthorizerImpl(@Autowired SiteClient siteClient) {
         this.trIdenCache = CacheBuilder.newBuilder()
-                .initialCapacity(10)
+                .initialCapacity(100)
                 .concurrencyLevel(10)
-                .expireAfterAccess(1, TimeUnit.DAYS)
+                .expireAfterAccess(1, TimeUnit.HOURS)
                 .build(new CacheLoader<Tr102Iden, DeviceIden>() {
                     @Override
                     public DeviceIden load(Tr102Iden key) throws Exception {

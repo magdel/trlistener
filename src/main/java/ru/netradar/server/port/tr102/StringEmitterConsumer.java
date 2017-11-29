@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.FluxSink;
+import ru.netradar.server.port.ConnectionData;
 
 import java.util.function.Consumer;
 
@@ -11,17 +12,17 @@ import java.util.function.Consumer;
  * Created by rfk on 17.11.2017.
  */
 @Component
-public class StringEmitterConsumer implements Consumer<FluxSink<String>> {
+public class StringEmitterConsumer implements Consumer<FluxSink<ConnectionData<String>>> {
     private static final Logger log = LoggerFactory.getLogger(StringEmitterConsumer.class);
-    private FluxSink<String> tr102MessageFluxSink;
+    private FluxSink<ConnectionData<String>> tr102MessageFluxSink;
 
     @Override
-    public void accept(FluxSink<String> tr102MessageFluxSink) {
+    public void accept(FluxSink<ConnectionData<String>> tr102MessageFluxSink) {
         log.info("Sink accepted");
         this.tr102MessageFluxSink = tr102MessageFluxSink;
     }
 
-    public FluxSink<String> getFluxSink() {
+    public FluxSink<ConnectionData<String>> getFluxSink() {
         return tr102MessageFluxSink;
     }
 }
