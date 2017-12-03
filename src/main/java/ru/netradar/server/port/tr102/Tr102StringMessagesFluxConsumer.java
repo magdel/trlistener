@@ -7,6 +7,8 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
 import reactor.core.scheduler.Schedulers;
 import ru.netradar.server.bus.handler.tr102.Tr102MessageConsumer;
+import ru.netradar.server.port.ConnectionData;
+import ru.netradar.server.port.ConnectionIdHolder;
 
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -16,21 +18,21 @@ import java.util.function.Consumer;
  */
 public class Tr102StringMessagesFluxConsumer {
     private static final Logger logger = LoggerFactory.getLogger(Tr102StringMessagesFluxConsumer.class);
-    private final Consumer<FluxSink<String>> trackerStringHandler;
+    private final Consumer<FluxSink<ConnectionData<String>>> stringEmitterConsumer;
     private final Tr102MessageConsumer tr102MessageConsumer;
     private final StringToNrLocationRecordMapper mapper;
     private Cancellation cancellation;
 
-    public Tr102StringMessagesFluxConsumer(StringEmitter trackerStringHandler,
+    public Tr102StringMessagesFluxConsumer(StringEmitterConsumer stringEmitterConsumer,
                                            Tr102MessageConsumer tr102MessageConsumer,
                                            StringToNrLocationRecordMapper mapper) {
-        this.trackerStringHandler = trackerStringHandler;
+        this.stringEmitterConsumer = stringEmitterConsumer;
         this.tr102MessageConsumer = tr102MessageConsumer;
         this.mapper = mapper;
     }
 
     public void init() {
-        cancellation = Flux.create(trackerStringHandler, FluxSink.OverflowStrategy.LATEST)
+        cancellation = Flux.create(stringEmitterConsumer, FluxSink.OverflowStrategy.LATEST)
                 //.log()
                 //.onBackpressureBuffer(32)
                 .publishOn(Schedulers.newSingle("mapper"))

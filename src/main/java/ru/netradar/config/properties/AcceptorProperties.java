@@ -33,6 +33,8 @@ public class AcceptorProperties {
 
     @NotNull
     private Integer portAsyncTr102;
+    @NotNull
+    private Integer portAsyncArtal;
 
     public Integer getPortAsyncTr102() {
         return portAsyncTr102;
@@ -40,6 +42,14 @@ public class AcceptorProperties {
 
     public void setPortAsyncTr102(Integer portAsyncTr102) {
         this.portAsyncTr102 = portAsyncTr102;
+    }
+
+    public Integer getPortAsyncArtal() {
+        return portAsyncArtal;
+    }
+
+    public void setPortAsyncArtal(Integer portAsyncArtal) {
+        this.portAsyncArtal = portAsyncArtal;
     }
 
     public Integer getPortMapnav() {

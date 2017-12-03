@@ -127,6 +127,9 @@ public class DeviceStorage implements DiagInformation {
                     deviceDAO.updateDeviceLocation(device, location);
                 }
             });
+            LOG.info("Stored");
+        } else {
+            LOG.info("Too often pos");
         }
     }
 

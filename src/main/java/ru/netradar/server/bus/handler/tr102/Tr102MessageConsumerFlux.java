@@ -7,6 +7,8 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
 import reactor.core.scheduler.Schedulers;
 import ru.netradar.server.bus.handler.db.position.IdentifiableLocationConsumer;
+import ru.netradar.server.port.ConnectionRegistryImpl;
+import ru.netradar.server.port.NrConnection;
 import ru.netradar.server.port.tr102.Tr102Message;
 
 import java.util.Optional;
@@ -22,11 +24,14 @@ public class Tr102MessageConsumerFlux implements Tr102MessageConsumer {
     private final Tr102MessageEmitterConsumer emitter;
     private final AuthorizedTr102Mapper authorizedTr102Mapper;
     private final IdentifiableLocationConsumer identifiableLocationConsumer;
+    private final ConnectionRegistryImpl connectionRegistry;
     private Cancellation cancellation;
 
     public Tr102MessageConsumerFlux(AuthorizedTr102Mapper authorizedTr102Mapper,
-                                    IdentifiableLocationConsumer identifiableLocationConsumer) {
+                                    IdentifiableLocationConsumer identifiableLocationConsumer,
+                                    ConnectionRegistryImpl connectionRegistry) {
         this.identifiableLocationConsumer = identifiableLocationConsumer;
+        this.connectionRegistry = connectionRegistry;
         this.emitter = new Tr102MessageEmitterConsumer();
         this.authorizedTr102Mapper = checkNotNull(authorizedTr102Mapper, "authorizedTr102Mapper");
     }

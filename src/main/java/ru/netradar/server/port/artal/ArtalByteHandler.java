@@ -1,9 +1,10 @@
-package ru.netradar.server.port.tr102;
+package ru.netradar.server.port.artal;
 
 import io.netty.channel.ChannelHandlerContext;
 import reactor.core.publisher.FluxSink;
 import ru.netradar.server.port.ConnectionData;
 import ru.netradar.server.port.ConnectionRegistry;
+import ru.netradar.server.port.tr102.BaseAdapter;
 import ru.netradar.utils.IdGenerator;
 import ru.netradar.utils.Utils;
 
@@ -15,15 +16,15 @@ import java.util.concurrent.atomic.AtomicLong;
  * Created by rfk on 15.11.2016.
  */
 
-public class Tr102StringHandler extends BaseAdapter {
+public class ArtalByteHandler extends BaseAdapter {
 
     private final AtomicLong readCounter = new AtomicLong();
     private final FluxSink<ConnectionData<String>> stringFluxSink;
     private String devImei = "";
 
-    public Tr102StringHandler(IdGenerator idGenerator,
-                              FluxSink<ConnectionData<String>> stringFluxSink,
-                              ConnectionRegistry connectionRegistry) {
+    public ArtalByteHandler(IdGenerator idGenerator,
+                            FluxSink<ConnectionData<String>> stringFluxSink,
+                            ConnectionRegistry connectionRegistry) {
         super(idGenerator, connectionRegistry);
         this.stringFluxSink = stringFluxSink;
     }
