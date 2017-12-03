@@ -16,8 +16,17 @@ import ru.netradar.server.acceptor.sockets.LocThread;
 import ru.netradar.server.storage.DeviceStorage;
 import ru.netradar.util.Util;
 
-import java.io.*;
+import java.io.BufferedOutputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.net.Socket;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author Raev
@@ -88,13 +97,17 @@ public class ARLocThread extends LocThread {
         LOG.info(s);
     }
 
+    private static AtomicInteger counter = new AtomicInteger();
+
     private static TeeInputStream decorateForFileLogging(InputStream in) throws FileNotFoundException {
         try {
             new File("/var/log/conns").mkdirs();
         } catch (Exception e) {
             //do nothing
         }
-        return new TeeInputStream(in, new FileOutputStream("/var/log/conns/"+ Util.getDateTimeString()+".dat"),true);
+
+        String filename = "/var/log/conns/" + Util.getDateTimeString() + "_" + counter.incrementAndGet() + ".dat";
+        return new TeeInputStream(in, new FileOutputStream(filename), true);
     }
 
     ByteArrayInputStream bais;
