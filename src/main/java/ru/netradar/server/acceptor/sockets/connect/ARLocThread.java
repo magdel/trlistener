@@ -8,11 +8,13 @@
  */
 package ru.netradar.server.acceptor.sockets.connect;
 
+import org.apache.commons.io.input.TeeInputStream;
 import org.apache.log4j.Logger;
 import ru.netradar.config.properties.WebMonitorProperties;
 import ru.netradar.server.acceptor.ARProtocol;
 import ru.netradar.server.acceptor.sockets.LocThread;
 import ru.netradar.server.storage.DeviceStorage;
+import ru.netradar.util.Util;
 
 import java.io.*;
 import java.net.Socket;
@@ -60,7 +62,8 @@ public class ARLocThread extends LocThread {
             //out.flush();
             bais = new ByteArrayInputStream(dataBuffer);
             dis = new DataInputStream(bais);
-            dissc = new DataInputStream(in);
+
+            dissc = new DataInputStream(decorateForFileLogging(in));
             try {
                 try {
                     while ((!isInterrupted()) && waitFor()) {
@@ -83,6 +86,15 @@ public class ARLocThread extends LocThread {
         conCount--;
         String s = remoteAddr + ": disconnected (" + (System.currentTimeMillis() - connected) / 1000 + " sec). Left " + conCount + " artals";
         LOG.info(s);
+    }
+
+    private static TeeInputStream decorateForFileLogging(InputStream in) throws FileNotFoundException {
+        try {
+            new File("/var/log/conns").mkdirs();
+        } catch (Exception e) {
+            //do nothing
+        }
+        return new TeeInputStream(in, new FileOutputStream("/var/log/conns/"+ Util.getDateTimeString()+".dat"),true);
     }
 
     ByteArrayInputStream bais;
