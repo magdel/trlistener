@@ -8,6 +8,7 @@
  */
 package ru.netradar.server.acceptor.sockets.connect;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.TeeInputStream;
 import org.apache.log4j.Logger;
 import ru.netradar.config.properties.WebMonitorProperties;
@@ -55,8 +56,9 @@ public class ARLocThread extends LocThread {
         try {
             socket.setSoTimeout(TIMEOUT);
 
+
             out = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
-            in = socket.getInputStream();
+            in = decorateForFileLogging(socket.getInputStream());
 
             remoteAddr = "" + conCount;
 
@@ -72,7 +74,6 @@ public class ARLocThread extends LocThread {
             bais = new ByteArrayInputStream(dataBuffer);
             dis = new DataInputStream(bais);
 
-            dissc = new DataInputStream(decorateForFileLogging(in));
             try {
                 try {
                     while ((!isInterrupted()) && waitFor()) {
@@ -88,6 +89,8 @@ public class ARLocThread extends LocThread {
                 //out.close();
                 //in.close();
                 socket.close();
+                IOUtils.closeQuietly(out);
+                IOUtils.closeQuietly(in);
             }
         } catch (Throwable e) {
             LOG.error("AR Error data process: " + e.toString());
@@ -112,7 +115,6 @@ public class ARLocThread extends LocThread {
 
     ByteArrayInputStream bais;
     DataInputStream dis;
-    DataInputStream dissc;
     ByteArrayOutputStream baos = new ByteArrayOutputStream(200);
     DataOutputStream dos = new DataOutputStream(baos);
     private byte minReadBytes = 1;
