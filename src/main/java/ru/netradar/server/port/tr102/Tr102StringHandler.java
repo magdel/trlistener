@@ -47,6 +47,7 @@ public class Tr102StringHandler extends BaseAdapter {
                     getDeviceIden(),
                     trackerMessage
             ));
+            log.info("Sinked");
         } else {
             log.warn("No emitter");
         }

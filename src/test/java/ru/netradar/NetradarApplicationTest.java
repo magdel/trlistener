@@ -1,5 +1,6 @@
 package ru.netradar;
 
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ import ru.netradar.server.acceptor.sockets.connect.TRLocThread;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -64,7 +66,7 @@ public class NetradarApplicationTest extends AbstractTestNGSpringContextTests {
         String s = "$355632000166323,1,1,040202,093633,E12129.2252,N2459.8891,00161,0.0100,147,07*37!\n";
         sendTR102TCPString(s);
         Thread.sleep(1000);
-       // Assert.assertEquals(httpConsumer.getAcceptCount(), 3);
+        // Assert.assertEquals(httpConsumer.getAcceptCount(), 3);
         Assert.assertEquals(TRLocThread.tryCount, 1);
 
     }
@@ -75,16 +77,17 @@ public class NetradarApplicationTest extends AbstractTestNGSpringContextTests {
         sendAsyncTR102TCPString(s);
         Thread.sleep(1000);
         // Assert.assertEquals(httpConsumer.getAcceptCount(), 3);
-       // Assert.assertEquals(TRLocThread.tryCount, 1);
+        // Assert.assertEquals(TRLocThread.tryCount, 1);
     }
 
     @Test
     public void shouldAcceptArtalNewPortFile() throws Exception {
         //String s = "$1000000001,1,2,040202,093633,E12129.2252,N2459.8891,00161,0.0100,147,07*37!\n";
         //read data from resource
+        byte[] bytes = IOUtils.resourceToByteArray("/sample_data_108.dat");
 
         //send data
-        //sendAsyncTR102TCPString(s);
+        sendAsyncArtalTCPString(bytes);
         Thread.sleep(1000);
 
         //check created task to deliver
@@ -94,18 +97,23 @@ public class NetradarApplicationTest extends AbstractTestNGSpringContextTests {
 
     private void sendTR102TCPString(String s) throws IOException, InterruptedException {
         int port = Integer.parseInt(environment.getProperty("acceptor.portTr102"));
-        sendLocalhostTCPString(s, port);
+        sendLocalhostTCPString(s.getBytes(StandardCharsets.US_ASCII), port);
     }
 
     private void sendAsyncTR102TCPString(String s) throws IOException, InterruptedException {
         int port = Integer.parseInt(environment.getProperty("acceptor.portAsyncTr102"));
-        sendLocalhostTCPString(s, port);
+        sendLocalhostTCPString(s.getBytes(StandardCharsets.US_ASCII), port);
     }
 
-    public static void sendLocalhostTCPString(String s, int port) throws IOException, InterruptedException {
+    private void sendAsyncArtalTCPString(byte[] data) throws IOException, InterruptedException {
+        int port = Integer.parseInt(environment.getProperty("acceptor.port-async-artal"));
+        sendLocalhostTCPString(data, port);
+    }
+
+    public static void sendLocalhostTCPString(byte[] data, int port) throws IOException, InterruptedException {
         Socket socket = new Socket("localhost", port);
         OutputStream outputStream = socket.getOutputStream();
-        outputStream.write(s.getBytes());
+        outputStream.write(data);
         outputStream.flush();
         Thread.sleep(1000);
         outputStream.close();

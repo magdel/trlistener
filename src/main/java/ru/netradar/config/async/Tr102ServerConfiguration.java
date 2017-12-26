@@ -12,9 +12,9 @@ import ru.netradar.server.port.ConnectionRegistry;
 import ru.netradar.server.port.ConnectionRegistryImpl;
 import ru.netradar.server.port.ServerLoopGroup;
 import ru.netradar.server.port.TCPServer;
-import ru.netradar.server.port.artal.ByteEmitterConsumer;
 import ru.netradar.server.port.tr102.StringEmitterConsumer;
 import ru.netradar.server.port.tr102.StringToNrLocationRecordMapper;
+import ru.netradar.server.port.tr102.Tr102StringHandler;
 import ru.netradar.server.port.tr102.Tr102StringMessagesFluxConsumer;
 import ru.netradar.utils.IdGenerator;
 
@@ -61,25 +61,10 @@ public class Tr102ServerConfiguration {
         return new TCPServer(acceptorProperties.getPortAsyncTr102(),
                 serverLoopGroup,
                 true,
-                idGenerator,
-                stringEmitterConsumer.getFluxSink(),
-                connectionRegistry,
-                new ByteToStringDecoder());
-    }
-
-    @Bean(initMethod = "init", destroyMethod = "shutdown")
-    public TCPServer artaltcpServer(ServerLoopGroup serverLoopGroup,
-                                    AcceptorProperties acceptorProperties,
-                                    ByteEmitterConsumer byteEmitterConsumer,
-                                    IdGenerator idGenerator,
-                                    ConnectionRegistry connectionRegistry) {
-        return new TCPServer(acceptorProperties.getPortAsyncArtal(),
-                serverLoopGroup,
-                false,
-                idGenerator,
-                byteEmitterConsumer.getFluxSink(),
-                connectionRegistry,
-                new ByteToStringDecoder());
+                new ByteToStringDecoder(),
+                new Tr102StringHandler(idGenerator,
+                        stringEmitterConsumer.getFluxSink(),
+                        connectionRegistry));
     }
 
 }

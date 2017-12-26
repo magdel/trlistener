@@ -23,28 +23,19 @@ public class TCPServer {
     private static final Logger logger = LoggerFactory.getLogger(TCPServer.class);
 
     private final int port;
-    private final FluxSink<ConnectionData<String>> stringFluxSink;
-    private final ConnectionRegistry connectionRegistry;
     private final ChannelHandlerAdapter[] channelHandlerAdapters;
     private final ServerLoopGroup serverLoopGroup;
     private final boolean linebasedDelimiter;
-    private final IdGenerator idGenerator;
     private ChannelFuture channelFuture;
 
     public TCPServer(int port,
                      ServerLoopGroup serverLoopGroup,
                      boolean linebasedDelimiter,
-                     IdGenerator idGenerator,
-                     FluxSink<ConnectionData<String>> stringFluxSink,
-                     ConnectionRegistry connectionRegistry,
                      ChannelHandlerAdapter... channelHandlerAdapters) {
         this.port = port;
-        this.stringFluxSink = stringFluxSink;
-        this.connectionRegistry = connectionRegistry;
         this.channelHandlerAdapters = channelHandlerAdapters;
         this.serverLoopGroup = serverLoopGroup;
         this.linebasedDelimiter = linebasedDelimiter;
-        this.idGenerator = checkNotNull(idGenerator);
     }
 
     public void init() {
@@ -62,11 +53,7 @@ public class TCPServer {
                             }
                             ch.pipeline()
                                     .addLast(channelHandlerAdapters);
-                            ch.pipeline()
-                                    .addLast("Tr102String",
-                                            new Tr102StringHandler(idGenerator,
-                                                    stringFluxSink,
-                                                    connectionRegistry));
+
                         }
                     })
                     .option(ChannelOption.SO_LINGER, 0)

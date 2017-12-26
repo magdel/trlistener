@@ -23,8 +23,8 @@ public class ServerLoopGroup {
     }
 
     public void init() {
-        bossGroup = new NioEventLoopGroup(1);
-        workerGroup = new NioEventLoopGroup(1);
+        bossGroup = new NioEventLoopGroup(2);
+        workerGroup = new NioEventLoopGroup(2);
     }
 
     public EventLoopGroup getBossGroup() {
